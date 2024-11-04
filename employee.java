@@ -2,21 +2,17 @@ public class Employee {
     private Integer employeeNumber;
     private Double workingHours;
     private String name;
-    private Integer age;
     private Integer experienceYears;
     private Double tiredness;
-    private String role;
     private Integer itemsDone;
 
-    public Employee(Integer employeeNumber, Double workingHours, String name, Integer age,
-                    Integer experienceYears, Double tiredness, String role, Integer itemsDone) {
+    public Employee(Integer employeeNumber, Double workingHours, String name,
+                    Integer experienceYears, Double tiredness, Integer itemsDone) {
         this.employeeNumber = employeeNumber;
         this.workingHours = workingHours;
         this.name = name;
-        this.age = age;
         this.experienceYears = experienceYears;
         this.tiredness = tiredness;
-        this.role = role;
         this.itemsDone = itemsDone;
     }
 
@@ -50,14 +46,6 @@ public class Employee {
         this.name = name;
     }
 
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
     public Integer getExperienceYears() {
         return experienceYears;
     }
@@ -72,14 +60,6 @@ public class Employee {
 
     public void setTiredness(Double tiredness) {
         this.tiredness = tiredness;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public Integer getItemsDone() {
