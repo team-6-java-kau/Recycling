@@ -7,13 +7,13 @@ public class Employee {
     private Integer itemsDone;
 
     public Employee(Integer employeeNumber, Double workingHours, String name,
-                    Integer experienceYears, Double tiredness, Integer itemsDone) {
+                    Integer experienceYears) {
         this.employeeNumber = employeeNumber;
-        this.workingHours = workingHours;
+        this.workingHours = 0.0;
         this.name = name;
         this.experienceYears = experienceYears;
-        this.tiredness = tiredness;
-        this.itemsDone = itemsDone;
+        this.tiredness = 0.0;
+        this.itemsDone = 0;
     }
 
 
@@ -69,4 +69,8 @@ public class Employee {
     public void setItemsDone(Integer itemsDone) {
         this.itemsDone = itemsDone;
     }
+
+    public void incrementItemsDone() {
+        this.itemsDone++;
+    }    
 }
