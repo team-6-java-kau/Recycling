@@ -1,4 +1,4 @@
-public class Recycle {
+public class Recyclableitem {
     private String itemType;
     private double size;
     private String condition;
@@ -6,7 +6,7 @@ public class Recycle {
     private boolean itemRecyclability;
 
     // Constructor
-    public Recycle(String itemType, double size, String condition, double itemWeight, boolean itemRecyclability) {
+    public Recyclableitem(String itemType, double size, String condition, double itemWeight, boolean itemRecyclability) {
         this.itemType = itemType;
         this.size = size;
         this.condition = condition;
