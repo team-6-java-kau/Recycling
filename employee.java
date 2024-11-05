@@ -4,7 +4,7 @@ public class Employee {
     private String name;
     private Integer experienceYears;
     Double tiredness;
-    private Integer itemsDone;
+    Integer itemsDone;
     Integer errorsNum;
 
     public Employee(Integer employeeNumber, Double workingHours, String name,
@@ -17,11 +17,6 @@ public class Employee {
         this.itemsDone = 0;
         this.errorsNum = 0;
 
-    }
-
-
-    public void sort() {
-        
     }
 
 
@@ -93,8 +88,10 @@ public class Employee {
         // double complexityModifier = recyclable.getComplexity(); // Example
     
         // Combine modifiers
+        
         double totalModifier = experienceModifier * tirednessModifier /* * complexityModifier */;
-    
+        double sort_time = baseTime * totalModifier;
+        recyclable.set_time_to_finish(sort_time);
         return baseTime * totalModifier;
     }
 
@@ -103,7 +100,7 @@ public class Employee {
 
         // Simulate working hours and tiredness accumulation
         workingHours += sortTime;
-        tiredness = sortTime * 0.2; // Increase tiredness based on sort time
+        tiredness += sortTime * 0.2; // Increase tiredness based on sort time
 
         // Simulate potential errors based on tiredness (optional)
         double errorChance = tiredness * 0.05; // Up to 5% error chance per unit of tiredness

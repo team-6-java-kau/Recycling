@@ -8,6 +8,7 @@ public class Recyclableitem {
     private String condition;
     private double itemWeight;
     private boolean done_sorting;
+    private double time_to_finish;
 
 
     // Constructor
@@ -17,6 +18,7 @@ public class Recyclableitem {
         this.condition = condition;
         this.itemWeight = itemWeight;
         this.done_sorting = done_sorting;
+        this.time_to_finish = 0.0;
     }
 
     // Getter and Setter methods
@@ -30,6 +32,9 @@ public class Recyclableitem {
     public void setItemWeight(double itemWeight) { this.itemWeight = itemWeight; }
     public boolean isDone_sorting() { return done_sorting; }
     public void setisDone_sorting(boolean done_sorting) { this.done_sorting = done_sorting; }
+    public void set_time_to_finish(double time_to_finish) { this.time_to_finish = time_to_finish; }
+    public double get_time_to_finish() { return time_to_finish; }
+
 
     // Method to create a list of Recycle objects
     public static List<Recyclableitem> createList(int number) {
