@@ -4,30 +4,26 @@ import java.util.Random;
 
 public class Recyclableitem {
     private String itemType;
-    private double size;
-    private String condition;
+    private Boolean sortingError;
     private double itemWeight;
     private boolean done_sorting;
     private double time_to_finish;
 
 
     // Constructor
-    public Recyclableitem(String itemType, double size, String condition, double itemWeight, boolean done_sorting) {
+    public Recyclableitem(String itemType, double itemWeight) {
         this.itemType = itemType;
-        this.size = size;
-        this.condition = condition;
+        this.sortingError = false;
         this.itemWeight = itemWeight;
-        this.done_sorting = done_sorting;
+        this.setisDone_sorting(false);
         this.time_to_finish = 0.0;
     }
 
     // Getter and Setter methods
     public String getItemType() { return itemType; }
     public void setItemType(String itemType) { this.itemType = itemType; }
-    public double getSize() { return size; }
-    public void setSize(double size) { this.size = size; }
-    public String getCondition() { return condition; }
-    public void setCondition(String condition) { this.condition = condition; }
+    public boolean getsortingError() { return sortingError; }
+    public void setsortingError(boolean sortingError) { this.sortingError = sortingError; }
     public double getItemWeight() { return itemWeight; }
     public void setItemWeight(double itemWeight) { this.itemWeight = itemWeight; }
     public boolean isDone_sorting() { return done_sorting; }
@@ -43,23 +39,21 @@ public class Recyclableitem {
 
         for (int i = 0; i < number; i++) {
             int type = random.nextInt(4);
-            double size = 0.5 + (5.0 - 0.5) * random.nextDouble();
-            String condition = random.nextBoolean() ? "Good" : "Damaged";
             double itemWeight = 0.1 + (2.0 - 0.1) * random.nextDouble();
-            boolean itemRecyclability = random.nextBoolean();
+        
 
             switch (type) {
                 case 0:
-                    items.add(new Plastic(size, condition, itemWeight, itemRecyclability));
+                    items.add(new Plastic(itemWeight));
                     break;
                 case 1:
-                    items.add(new Metal(size, condition, itemWeight, itemRecyclability));
+                    items.add(new Metal(itemWeight));
                     break;
                 case 2:
-                    items.add(new Glass(size, condition, itemWeight, itemRecyclability));
+                    items.add(new Glass(itemWeight));
                     break;
                 case 3:
-                    items.add(new Paper(size, condition, itemWeight, itemRecyclability));
+                    items.add(new Paper(itemWeight));
                     break;
             }
         }

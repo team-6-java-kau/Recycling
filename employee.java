@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class Employee {
     private Integer employeeNumber;
     private Double workingHours;
@@ -6,19 +10,21 @@ public class Employee {
     Double tiredness;
     Integer itemsDone;
     Integer errorsNum;
+    private static final String[] NAMES = {
+        "Liam", "Emma", "Noah", "Olivia", "William", "Ava", 
+        "James", "Isabella", "Salman", "Sophia"
+    };
 
-    public Employee(Integer employeeNumber, Double workingHours, String name,
-                    Integer experienceYears) {
+    public Employee(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {
         this.employeeNumber = employeeNumber;
-        this.workingHours = 0.0;
+        this.workingHours = workingHours;
         this.name = name;
         this.experienceYears = experienceYears;
         this.tiredness = 0.0;
         this.itemsDone = 0;
         this.errorsNum = 0;
-
     }
-
+    
 
     public Integer getEmployeeNumber() {
         return employeeNumber;
@@ -111,7 +117,29 @@ public class Employee {
 
         // Increment items done and return success flag
         incrementItemsDone();
-       
+        if (hasError == true){
+            recyclable.setsortingError(true);
+        }
+        
         return !hasError;
     }
+    // Method to create a list of Employees with random attributes
+    public static List<Employee> createEmployees(int number) {
+        List<Employee> employees = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < number; i++) {
+            String name = NAMES[random.nextInt(NAMES.length)];
+            int experienceYears = random.nextInt(10); // 0 to 10 years of experience
+            double workingHours = random.nextDouble() * 8; // Random working hours between 0 to 8
+
+            Employee employee = new Employee(i + 1, workingHours, name, experienceYears);
+            employees.add(employee);
+        }
+
+        return employees;
+    }
+
 }
+
+
