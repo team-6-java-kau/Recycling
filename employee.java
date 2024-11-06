@@ -83,19 +83,13 @@ public class Employee {
 
 
     public double calculateSortTime(Recyclableitem recyclable) {
-        // Base time for sorting a simple recyclable
         double baseTime = 2.0;
     
-        // Apply modifiers based on experience and tiredness
-        double experienceModifier = 1.0 - (experienceYears * 0.05); // Up to 20% faster per year
+        double experienceModifier =Math.abs( 1.0 - (experienceYears * 0.05)); // Up to 20% faster per year
         double tirednessModifier = 1.0 + (workingHours * 0.01); // Up to 10% slower per hour of work
-    
-        // Apply modifiers based on recyclable complexity (optional)
-        // double complexityModifier = recyclable.getComplexity(); // Example
-    
-        // Combine modifiers
+
         
-        double totalModifier = experienceModifier * tirednessModifier /* * complexityModifier */;
+        double totalModifier = experienceModifier * tirednessModifier ;
         double sort_time = baseTime * totalModifier;
         recyclable.set_time_to_finish(sort_time);
         return baseTime * totalModifier;
@@ -104,18 +98,16 @@ public class Employee {
     public boolean sort(Recyclableitem recyclable) {
         double sortTime = calculateSortTime(recyclable);
 
-        // Simulate working hours and tiredness accumulation
         workingHours += sortTime;
-        tiredness += sortTime * 0.2; // Increase tiredness based on sort time
+        tiredness += sortTime * 0.2;
 
-        // Simulate potential errors based on tiredness (optional)
-        double errorChance = tiredness * 0.05; // Up to 5% error chance per unit of tiredness
+        double errorChance = tiredness * 0.05; 
         boolean hasError = Math.random() < errorChance;
 
-        // Update recyclable status
+    
         recyclable.setisDone_sorting(true);
 
-        // Increment items done and return success flag
+      
         incrementItemsDone();
         if (hasError == true){
             recyclable.setsortingError(true);
