@@ -47,13 +47,13 @@ public class Recyclableitem {
                     items.add(new Plastic(itemWeight));
                     break;
                 case 1:
-                    items.add(new Metal(itemWeight));
+                    items.add(new Metal((itemWeight * 4)));
                     break;
                 case 2:
-                    items.add(new Glass(itemWeight));
+                    items.add(new Glass(itemWeight * 2));
                     break;
                 case 3:
-                    items.add(new Paper(itemWeight));
+                    items.add(new Paper(itemWeight * 0.2));
                     break;
             }
         }
