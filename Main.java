@@ -9,7 +9,7 @@ public class Main {
         input.close();
 
         Employee muhammed = new Employee(1, 5.0, "Moha", experience_input);
-        DistributionEmployee distributor = new DistributionEmployee(2, 5.0, "Sara", 3); // Create a distribution employee
+        Employee distributor = new Employee(2, 5.0, "Sara", 3); // Create a distribution employee
 
         Factory one = new Factory();
         one.manual(items, muhammed, distributor); // Pass both employees
@@ -17,7 +17,7 @@ public class Main {
         if (items != null && !items.isEmpty()) {
             System.out.println("List created successfully with " + items.size() + " items.");
             for (Recyclableitem item : items) {
-                System.out.println(item.getItemType() + " - " +  item.getsortingError() + " - " + item.get_time_to_finish() + " - " + item.getItemWeight());
+                System.out.println(item.getItemType() + " - " +  item.getsortingError() + " - " + item.get_time_to_sort() + " - " + item.getItemWeight());
             }
         } else {
             System.out.println("Failed to create list.");
