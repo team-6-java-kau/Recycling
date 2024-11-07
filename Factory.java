@@ -1,19 +1,15 @@
 import java.util.List;
 
 public class Factory {
-
-    public void manual(List<Recyclableitem> recyclables, Employee employee) {
+    public void manual(List<Recyclableitem> recyclables, Employee sortingEmployee, DistributionEmployee distributionEmployee) {
         for (Recyclableitem recyclable : recyclables) {
-            boolean success = employee.sort(recyclable);
-            
-           
-
-            //System.out.println(recyclable.get_time_to_finish());
-            // Handle success or error based on the return value
+            boolean success = sortingEmployee.sort(recyclable);
             if (!success) {
-                employee.incrementerrorsNum();
+                sortingEmployee.incrementerrorsNum();
+            } else {
+                // Distribute the item after sorting
+                distributionEmployee.distributeItem(recyclable);
             }
-
         }
     }
 

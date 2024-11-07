@@ -9,7 +9,6 @@ public class Recyclableitem {
     private boolean done_sorting;
     private double time_to_finish;
 
-
     // Constructor
     public Recyclableitem(String itemType, double itemWeight) {
         this.itemType = itemType;
@@ -31,7 +30,6 @@ public class Recyclableitem {
     public void set_time_to_finish(double time_to_finish) { this.time_to_finish = time_to_finish; }
     public double get_time_to_finish() { return time_to_finish; }
 
-
     // Method to create a list of Recycle objects
     public static List<Recyclableitem> createList(int number) {
         List<Recyclableitem> items = new ArrayList<>();
@@ -40,14 +38,13 @@ public class Recyclableitem {
         for (int i = 0; i < number; i++) {
             int type = random.nextInt(4);
             double itemWeight = 0.1 + (2.0 - 0.1) * random.nextDouble();
-        
 
             switch (type) {
                 case 0:
                     items.add(new Plastic(itemWeight));
                     break;
                 case 1:
-                    items.add(new Metal((itemWeight * 4)));
+                    items.add(new Metal(itemWeight * 4));
                     break;
                 case 2:
                     items.add(new Glass(itemWeight * 2));
@@ -58,5 +55,29 @@ public class Recyclableitem {
             }
         }
         return items;
+    }
+}
+
+class Glass extends Recyclableitem {
+    public Glass(double itemWeight) {
+        super("Glass", itemWeight);
+    }
+}
+
+class Metal extends Recyclableitem {
+    public Metal(double itemWeight) {
+        super("Metal", itemWeight);
+    }
+}
+
+class Paper extends Recyclableitem {
+    public Paper(double itemWeight) {
+        super("Paper", itemWeight);
+    }
+}
+
+class Plastic extends Recyclableitem {
+    public Plastic(double itemWeight) {
+        super("Plastic", itemWeight);
     }
 }
