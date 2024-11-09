@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Random;
 
 public class Employee {
@@ -10,10 +9,7 @@ public class Employee {
     Double tiredness;
     Integer itemsDone;
     Integer errorsNum;
-    /*private static final String[] NAMES = {
-        "Liam", "Emma", "Noah", "Olivia", "William", "Ava", 
-        "James", "Isabella", "Salman", "Sophia"
-    };*/
+  
 
     public Employee(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {
         this.employeeNumber = employeeNumber;
