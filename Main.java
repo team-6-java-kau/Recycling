@@ -3,9 +3,11 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        List<Recyclableitem> items = Recyclableitem.createList(3);
+        List<Recyclableitem> items = Recyclableitem.createList(12);
         Scanner input = new Scanner(System.in);
         Integer experience_input = input.nextInt();
+        Integer Timescalse = input.nextInt();
+
 
         input.close();
 
@@ -13,6 +15,7 @@ public class Main {
         Employee distributor = new Employee(2, 5.0, "Spotty", 3); // Create a distribution employee
 
         Factory one = new Factory();
+        one.setTimescale(Timescalse);
         one.manual(items, sorter, distributor); // Pass both employees
 
 

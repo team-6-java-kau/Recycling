@@ -53,7 +53,7 @@ public class Employee {
             sortTime += 0.1 + (random.nextDouble() * 0.8); // Add random number between 0.1 and 0.9
              }
         sortTime = Math.round(sortTime * 10.0) / 10.0; // Format to one decimal place
-        recyclable.set_time_to_sort(Math.round(sortTime));
+        recyclable.set_time_to_sort(sortTime);
         return sortTime;
     }
 
@@ -66,7 +66,7 @@ public class Employee {
 
         double errorChance = Math.min(0.3, (tiredness * 0.05) - (experienceYears * 0.01)); // Error depends on tiredness and experience
         boolean hasError = random.nextDouble() < errorChance;
-        sortTime = Math.round(sortTime * 10.0) / 10.0;
+
         recyclable.setisDone_sorting(true);
 
         incrementItemsDone();
