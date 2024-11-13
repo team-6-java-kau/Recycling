@@ -6,75 +6,162 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class GUIMain {
     private JFrame frame;
     private JTextArea resultArea;
     private Employee sortingEmployee;
+    private Employee distributionEmployee;
     private ItemPanel itemPanel;
     private Timer itemGenerationTimer;
-    private List<MovingItem> movingItems; // List to hold multiple moving items
-    private String[] itemTypes = {"Plastic", "Metal", "Glass", "Paper"}; // Available item types
-    private Color[] itemColors = {Color.BLUE, Color.GRAY, Color.GREEN, Color.YELLOW}; // Colors for each material
-    private int laneWidth = 150; // Width of each lane
-    private int laneHeight = 120; // Height of each lane
-    private int[] sortedCounts = new int[itemTypes.length]; // Count of sorted items per type
+    private List<MovingItem> movingItems;
+    private String[] itemTypes = {"Plastic", "Metal", "Glass", "Paper"};
+    private Color[] itemColors = {Color.BLUE, Color.GRAY, Color.GREEN, Color.YELLOW};
+    private int laneWidth = 150;
+    private int laneHeight = 120;
+    private int[] sortedCounts = new int[itemTypes.length];
+    private Queue<Recyclableitem> buffer;
+    private Factory factory;
+    private static final int MAX_BUFFER_SIZE = 3;
+    private int timeScale = 1000; // Default timescale (1 second = 1000ms)
+    private int totalMaterials; // Add this field
 
     public GUIMain() {
-        // Initialize employee
-        sortingEmployee = new Employee(1, 0.0, "Sorting Employee", 5);
-        movingItems = new ArrayList<>(); // Initialize the list of moving items
+        // Prompt for number of materials at startup
+        String input = JOptionPane.showInputDialog(null, 
+            "Enter the number of materials to process:", 
+            "Number of Materials", 
+            JOptionPane.QUESTION_MESSAGE);
+        
+        try {
+            totalMaterials = Integer.parseInt(input);
+            if (totalMaterials <= 0) {
+                JOptionPane.showMessageDialog(null, "Invalid number. Using default value of 10.");
+                totalMaterials = 10;
+            }
+        } catch (NumberFormatException | NullPointerException e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Using default value of 10.");
+            totalMaterials = 10;
+        }
 
-        // Create the main frame with larger dimensions
-        frame = new JFrame("Recycling Simulator");
+        // Initialize components
+        sortingEmployee = new Employee(1, 0.0, "Sorter", 5);
+        distributionEmployee = new Employee(2, 0.0, "Distributor", 3);
+        movingItems = new ArrayList<>();
+        buffer = new LinkedList<>();
+        factory = new Factory();
+        factory.setTimescale(1); // Set default timescale
+
+        // Create GUI components
+        frame = new JFrame("Recycling Simulator (" + totalMaterials + " items remaining)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 500); // Increased size of the frame
-        frame.setLayout(new FlowLayout());
+        frame.setSize(800, 600);
+        frame.setLayout(new BorderLayout());
 
-        // Text area to display results
-        resultArea = new JTextArea(10, 40); // Increased width of text area
+        // Control panel
+        JPanel controlPanel = new JPanel();
+        JButton startButton = new JButton("Start");
+        JTextField timeScaleField = new JTextField("1", 5);
+        controlPanel.add(new JLabel("Time Scale:"));
+        controlPanel.add(timeScaleField);
+        controlPanel.add(startButton);
+
+        // Main display components
+        resultArea = new JTextArea(10, 40);
         resultArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(resultArea);
 
-        // Item panel for drawing with larger size
         itemPanel = new ItemPanel();
-        itemPanel.setPreferredSize(new Dimension(600, 350)); // Increased size of item panel
+        itemPanel.setPreferredSize(new Dimension(600, 350));
 
-        // Start the item generation timer
-        itemGenerationTimer = new Timer(2000, e -> generateNewItem());
-        itemGenerationTimer.start(); // Start generating items every 2 seconds
+        // Layout
+        frame.add(controlPanel, BorderLayout.NORTH);
+        frame.add(scrollPane, BorderLayout.EAST);
+        frame.add(itemPanel, BorderLayout.CENTER);
 
-        // Add components to the frame
-        frame.add(scrollPane);
-        frame.add(itemPanel);
+        startButton.addActionListener(e -> {
+            try {
+                int newTimeScale = Integer.parseInt(timeScaleField.getText());
+                factory.setTimescale(newTimeScale);
+                timeScale = newTimeScale * 1000;
+                if (itemGenerationTimer == null || !itemGenerationTimer.isRunning()) {
+                    itemGenerationTimer = new Timer(2000, ev -> {
+                        if (totalMaterials > 0) {
+                            generateNewItem();
+                            totalMaterials--;
+                            frame.setTitle("Recycling Simulator (" + totalMaterials + " items remaining)");
+                            if (totalMaterials == 0) {
+                                itemGenerationTimer.stop();
+                                JOptionPane.showMessageDialog(frame, "All materials processed!");
+                            }
+                        }
+                    });
+                    itemGenerationTimer.start();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Please enter a valid number for time scale");
+            }
+        });
+
         frame.setVisible(true);
     }
 
     private void generateNewItem() {
-        // Randomly select an item type
         int randomIndex = new Random().nextInt(itemTypes.length);
-        Color itemColor = itemColors[randomIndex]; // Get corresponding color
-        double itemWeight = new Random().nextDouble() * 2; // Random weight between 0 and 2
-
-        // Create a new moving item and add it to the list
-        MovingItem item = new MovingItem(randomIndex, itemColor, itemWeight);
-        movingItems.add(item); // Add the new item to the list
-        item.startMovement(itemPanel, this::itemSorted); // Start moving the item
-    }
-
-    private void itemSorted(MovingItem item) {
-        int materialIndex = item.getMaterialIndex();
-        sortedCounts[materialIndex]++; // Increment sorted count for the material
-        boolean sortedSuccessfully = sortingEmployee.sort(item.getRecyclableItem()); // Sort the item
-        if (sortedSuccessfully) {
-            resultArea.append(item.getItemType() + " sorted successfully.\n");
-        } else {
-            resultArea.append(item.getItemType() + " sorting failed.\n");
+        double itemWeight = 0.1 + (2.0 - 0.1) * new Random().nextDouble();
+        
+        Recyclableitem recyclable;
+        switch (randomIndex) {
+            case 0: recyclable = new Plastic(itemWeight); break;
+            case 1: recyclable = new Metal(itemWeight); break;
+            case 2: recyclable = new Glass(itemWeight); break;
+            default: recyclable = new Paper(itemWeight); break;
         }
+
+        MovingItem movingItem = new MovingItem(randomIndex, itemColors[randomIndex], recyclable);
+        movingItems.add(movingItem);
+        movingItem.startMovement(itemPanel, this::processItem);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(GUIMain::new);
+    private void processItem(MovingItem item) {
+        SwingWorker<Void, String> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Recyclableitem recyclable = item.getRecyclableItem();
+                
+                // Sorting
+                boolean sortSuccess = sortingEmployee.sort(recyclable);
+                publish("Sorting " + recyclable.getItemType() + 
+                       " - Time: " + recyclable.get_time_to_sort() + "s" +
+                       (sortSuccess ? " - Success" : " - Failed"));
+                
+                Thread.sleep((long)(recyclable.get_time_to_sort() * timeScale));
+
+                // Distribution
+                buffer.add(recyclable);
+                if (buffer.size() >= MAX_BUFFER_SIZE) {
+                    Recyclableitem toDistribute = buffer.poll();
+                    distributionEmployee.distributeItem(toDistribute);
+                    publish("Distributing " + toDistribute.getItemType() + 
+                           " - Time: " + toDistribute.get_time_to_distribute() + "s");
+                    Thread.sleep((long)(toDistribute.get_time_to_distribute() * timeScale));
+                }
+
+                sortedCounts[item.getMaterialIndex()]++;
+                return null;
+            }
+
+            @Override
+            protected void process(List<String> chunks) {
+                for (String message : chunks) {
+                    resultArea.append(message + "\n");
+                }
+                itemPanel.repaint();
+            }
+        };
+        worker.execute();
     }
 
     // Inner class for custom drawing
@@ -113,15 +200,15 @@ public class GUIMain {
     class MovingItem {
         private int materialIndex;
         private Color color;
-        private double weight;
+        private Recyclableitem recyclable;
         private int itemX; // X position of the item
         private int itemY; // Y position of the item
         private Timer movementTimer;
 
-        public MovingItem(int materialIndex, Color color, double weight) {
+        public MovingItem(int materialIndex, Color color, Recyclableitem recyclable) {
             this.materialIndex = materialIndex;
             this.color = color;
-            this.weight = weight;
+            this.recyclable = recyclable;
             this.itemX = 0; // Start at the beginning of the main lane
             this.itemY = 0; // Initialize itemY as 0, will be set during lane branching
         }
@@ -173,17 +260,11 @@ public class GUIMain {
         }
 
         public Recyclableitem getRecyclableItem() {
-            // Create and return the appropriate Recyclableitem based on the material index
-            double weight = this.weight; // Use the weight assigned to this item
-            switch (materialIndex) {
-                case 0: return new Plastic(weight);
-                case 1: return new Metal(weight);
-                case 2: return new Glass(weight);
-                case 3: return new Paper(weight);
-                default: return null; // Should not happen
-            }
+            return recyclable;
         }
     }
-}
 
-// Assume Recyclableitem, Plastic, Metal, Glass, and Paper classes exist with the appropriate methods.
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(GUIMain::new);
+    }
+}

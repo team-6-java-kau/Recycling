@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        List<Recyclableitem> items = Recyclableitem.createList(303);
+        List<Recyclableitem> items = Recyclableitem.createList(10);
         Scanner input = new Scanner(System.in);
         Integer experience_input = input.nextInt();
         Integer Timescalse = input.nextInt();
