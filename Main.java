@@ -3,22 +3,30 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        List<Recyclableitem> items = Recyclableitem.createList(10);
+        // Initialize the GUI
+        GUIMain gui = new GUIMain();
+
+        // Get user input for experience and timescale
         Scanner input = new Scanner(System.in);
+        System.out.print("Enter experience: ");
         Integer experience_input = input.nextInt();
-        Integer Timescalse = input.nextInt();
-
-
+        System.out.print("Enter timescale: ");
+        Integer timescale = input.nextInt();
         input.close();
 
+        // Create items
+        List<Recyclableitem> items = Recyclableitem.createList(10);
+
+        // Create employees
         Employee sorter = new Employee(1, 5.0, "Moha", experience_input);
-        Employee distributor = new Employee(2, 5.0, "Spotty", 3); // Create a distribution employee
+        Employee distributor = new Employee(2, 5.0, "Spotty", 3);
 
-        Factory one = new Factory();
-        one.setTimescale(Timescalse);
-        one.manual(items, sorter, distributor); // Pass both employees
+        // Start the factory process
+        Factory factory = new Factory(gui);
+        factory.setTimescale(timescale);
+        new Thread(() -> factory.manual(items, sorter, distributor)).start();
 
-
+        // Print errors encountered
         System.out.println("Errors encountered: " + sorter.errorsNum);
     }
 }

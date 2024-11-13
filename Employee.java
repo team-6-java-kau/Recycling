@@ -1,4 +1,3 @@
-
 import java.util.Random;
 
 public class Employee {
@@ -9,7 +8,6 @@ public class Employee {
     Double tiredness;
     Integer itemsDone;
     Integer errorsNum;
-  
 
     public Employee(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {
         this.employeeNumber = employeeNumber;
@@ -51,7 +49,7 @@ public class Employee {
         if (sortTime < 1.0) { 
             sortTime = Math.max(sortTime, 1.0); // Ensure minimum time is 1 second
             sortTime += 0.1 + (random.nextDouble() * 0.8); // Add random number between 0.1 and 0.9
-             }
+        }
         sortTime = Math.round(sortTime * 10.0) / 10.0; // Format to one decimal place
         recyclable.set_time_to_sort(sortTime);
         return sortTime;
@@ -67,8 +65,6 @@ public class Employee {
         double errorChance = Math.min(0.3, (tiredness * 0.05) - (experienceYears * 0.01)); // Error depends on tiredness and experience
         boolean hasError = random.nextDouble() < errorChance;
 
-        recyclable.setisDone_sorting(true);
-
         incrementItemsDone();
         if (hasError) {
             recyclable.setsortingError(true);
@@ -76,6 +72,7 @@ public class Employee {
 
         return !hasError;
     }
+
     public double calculateDistributeTime(Recyclableitem item) {
         Random random = new Random();
         double baseTime = 3.0; // Base time to distribute an item, more than sorting time
@@ -93,7 +90,6 @@ public class Employee {
 
     public void distributeItem(Recyclableitem item) {
         double distributeTime = calculateDistributeTime(item);
-        //System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
 
         workingHours += distributeTime;
         tiredness += distributeTime * 0.3; // Increment tiredness
@@ -116,6 +112,6 @@ public class Employee {
                 System.out.println(getName() + " encountered an unknown item type: " + item.getItemType());
                 break;
         }
-     }
     }
-  
+}
+
