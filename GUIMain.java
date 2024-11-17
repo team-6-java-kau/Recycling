@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+<<<<<<< Updated upstream
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -47,9 +48,106 @@ public class GUIMain {
         // Add components to the frame
         frame.add(scrollPane);
         frame.add(itemPanel);
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class GUIMain {
+    private JFrame frame;
+    private JTextField experienceField;
+    private JTextField timescaleField;
+    private JTextArea outputArea;
+    private RailPanel railPanel;
+    private List<MovingObject> movingObjects;
+    private Timer timer;
+
+    public GUIMain() {
+        frame = new JFrame("Simulation");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(2, 2));
+
+        inputPanel.add(new JLabel("Experience:"));
+        experienceField = new JTextField();
+        inputPanel.add(experienceField);
+
+        inputPanel.add(new JLabel("Timescale:"));
+        timescaleField = new JTextField();
+        inputPanel.add(timescaleField);
+
+        JButton startButton = new JButton("Start");
+        inputPanel.add(startButton);
+
+        startButton.addActionListener(e -> {
+            System.out.println("Start button clicked");
+            if (experienceField.getText().trim().isEmpty() || 
+                timescaleField.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Please enter both Experience and Timescale values",
+                    "Input Required",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            startSimulation();
+        });
+
+        railPanel = new RailPanel();
+        frame.add(railPanel, BorderLayout.CENTER);
+
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        scrollPane.setPreferredSize(new Dimension(200, frame.getHeight()));
+        frame.add(scrollPane, BorderLayout.EAST);
+
+        frame.add(inputPanel, BorderLayout.NORTH);
+>>>>>>> Stashed changes
         frame.setVisible(true);
+
+        movingObjects = new ArrayList<>();
     }
 
+    private void startSimulation() {
+        // Add logic to start the simulation
+        // For example, create MovingObject instances and add them to the movingObjects list
+        Recyclableitem item1 = new Metal(5.0);
+        Recyclableitem item2 = new Plastic(10.0);
+        Recyclableitem item3 = new Glass(7.0);
+        Recyclableitem item4 = new Paper(3.0);
+        movingObjects.add(new MovingObject(item1, 0));
+        movingObjects.add(new MovingObject(item2, 100));
+        movingObjects.add(new MovingObject(item3, 200));
+        movingObjects.add(new MovingObject(item4, 300));
+        railPanel.setMovingObjects(movingObjects);
+        railPanel.repaint();
+
+        // Start the timer to move objects
+        timer = new Timer(100, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                railPanel.repaint();
+            }
+        });
+        timer.start();
+    }
+
+    public void updateSortingStatus(Recyclableitem item, boolean status) {
+        // Add logic to update sorting status
+        System.out.println("Sorting status updated for: " + item.getItemType() + " to " + status);
+        item.setisDone_sorting(status);
+    }
+
+    public void updateDistributionStatus(Recyclableitem item) {
+        // Add logic to update distribution status
+        System.out.println("Distribution status updated for: " + item.getItemType());
+        item.setisdone_distribute(true);
+    }
+
+<<<<<<< Updated upstream
     private void generateNewItem() {
         // Randomly select an item type
         int randomIndex = new Random().nextInt(itemTypes.length);
@@ -70,12 +168,125 @@ public class GUIMain {
             resultArea.append(item.getItemType() + " sorted successfully.\n");
         } else {
             resultArea.append(item.getItemType() + " sorting failed.\n");
+=======
+    private class MovingObject {
+        int x, y;
+        Color color;
+        Recyclableitem item;
+        boolean sorted;
+
+        MovingObject(Recyclableitem item, int startX) {
+            this.item = item;
+            this.x = startX; // Starting X position with delay
+            this.y = 0; // Y position will be set based on the middle line
+            this.color = getColorForType(item.getItemType());
+            this.sorted = false;
+        }
+
+        private Color getColorForType(String itemType) {
+            switch (itemType) {
+                case "Metal":
+                    return Color.GRAY;
+                case "Plastic":
+                    return Color.BLUE;
+                case "Glass":
+                    return Color.GREEN;
+                case "Paper":
+                    return Color.YELLOW;
+                default:
+                    return Color.BLACK;
+            }
+        }
+
+        public void draw(Graphics g, int middleY, int mainBeltEnd) {
+            if (!sorted) {
+                this.y = middleY; // Set the Y position based on the middle line
+                g.setColor(color);
+                g.fillOval(x, y - 10, 20, 20); // Draw the object centered on the middle line
+                // Update the position for the next frame
+                x += 5; // Move right
+                if (x > mainBeltEnd) { // Use mainBeltEnd instead of getWidth()
+                    // Redirect to the respective lane
+                    sorted = true;
+                    switch (item.getItemType()) {
+                        case "Metal":
+                            y = middleY - 60;
+                            break;
+                        case "Plastic":
+                            y = middleY - 30;
+                            break;
+                        case "Glass":
+                            y = middleY + 30;
+                            break;
+                        case "Paper":
+                            y = middleY + 60;
+                            break;
+                    }
+                    x = mainBeltEnd; // Move to the start of the lane
+                }
+            } else {
+                g.setColor(color);
+                g.fillOval(x, y - 10, 20, 20); // Draw the object in its lane
+                // Update the position for the next frame
+                x += 5; // Move right
+                if (x > mainBeltEnd + 100) { // Use mainBeltEnd + 100 for the lanes
+                    x = mainBeltEnd; // Reset to start of the lane
+                }
+            }
+            // Use the item field to display item information (optional)
+            g.setColor(Color.BLACK);
+            g.drawString(item.getItemType(), x, y - 20);
+        }
+    }
+
+    private class RailPanel extends JPanel {
+        private List<MovingObject> movingObjects;
+
+        RailPanel() {
+            this.movingObjects = new ArrayList<>();
+        }
+
+        void setMovingObjects(List<MovingObject> movingObjects) {
+            this.movingObjects = movingObjects;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            int middleY = getHeight() / 2;
+            int mainBeltEnd = getWidth() - 150; // Shorten the main conveyor belt
+            // Draw the main conveyor belt
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(0, middleY - 5, mainBeltEnd, 10);
+            g.setColor(Color.LIGHT_GRAY);
+            for (int i = 0; i < mainBeltEnd; i += 20) {
+                g.fillRect(i, middleY - 5, 10, 10);
+            }
+            // Draw the additional lanes
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(mainBeltEnd, middleY - 65, 150, 10); // Metal lane
+            g.fillRect(mainBeltEnd, middleY - 35, 150, 10); // Plastic lane
+            g.fillRect(mainBeltEnd, middleY + 25, 150, 10); // Glass lane
+            g.fillRect(mainBeltEnd, middleY + 55, 150, 10); // Paper lane
+            g.setColor(Color.LIGHT_GRAY);
+            for (int i = mainBeltEnd; i < mainBeltEnd + 150; i += 20) {
+                g.fillRect(i, middleY - 65, 10, 10); // Metal lane
+                g.fillRect(i, middleY - 35, 10, 10); // Plastic lane
+                g.fillRect(i, middleY + 25, 10, 10); // Glass lane
+                g.fillRect(i, middleY + 55, 10, 10); // Paper lane
+            }
+            // Draw the moving objects
+            for (MovingObject obj : movingObjects) {
+                obj.draw(g, middleY, mainBeltEnd);
+            }
+>>>>>>> Stashed changes
         }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(GUIMain::new);
     }
+<<<<<<< Updated upstream
 
     // Inner class for custom drawing
     class ItemPanel extends JPanel {
@@ -187,3 +398,6 @@ public class GUIMain {
 }
 
 // Assume Recyclableitem, Plastic, Metal, Glass, and Paper classes exist with the appropriate methods.
+=======
+}
+>>>>>>> Stashed changes

@@ -11,8 +11,6 @@ public class Recyclableitem {
     private double time_to_sort;
     private double time_to_distribute;
 
-
-
     // Constructor
     public Recyclableitem(String itemType, double itemWeight) {
         this.itemType = itemType;
@@ -38,7 +36,12 @@ public class Recyclableitem {
     public double get_time_to_sort() { return time_to_sort; }
     public void set_time_to_distribute(double time_to_distribute) { this.time_to_distribute = time_to_distribute; }
     public double get_time_to_distribute() { return time_to_distribute; }
+<<<<<<< Updated upstream
     // Method to create a list of Recycle objects
+=======
+
+    // Method to create a list of Recyclableitem objects
+>>>>>>> Stashed changes
     public static List<Recyclableitem> createList(int number) {
         List<Recyclableitem> items = new ArrayList<>();
         Random random = new Random();
@@ -64,6 +67,7 @@ public class Recyclableitem {
         }
         return items;
     }
+<<<<<<< Updated upstream
 }
 
 class Glass extends Recyclableitem {
@@ -88,4 +92,6 @@ class Plastic extends Recyclableitem {
     public Plastic(double itemWeight) {
         super("Plastic", itemWeight);
     }
+=======
+>>>>>>> Stashed changes
 }

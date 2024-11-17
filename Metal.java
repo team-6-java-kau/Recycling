@@ -1,5 +1,5 @@
-class Metal extends Recyclableitem {
+public class Metal extends Recyclableitem {
     public Metal(double itemWeight) {
-        super("Metal",itemWeight);
+        super("Metal", itemWeight);
     }
 }
