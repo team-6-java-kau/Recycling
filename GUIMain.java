@@ -27,6 +27,7 @@ public class GUIMain {
     private Image metalImage;
     private Image glassImage;
     private Image paperImage;
+    private boolean isSorting = false;
 
     public GUIMain() {
         frame = new JFrame("Simulation");
@@ -169,56 +170,75 @@ public class GUIMain {
         }
 
         public void draw(Graphics g, int middleY, int mainBeltEnd, int sorterX, int distributorX, int[] lanePositions) {
-            if (!sorted && x >= sorterX - 10 && x <= sorterX + 10) {
+            if (!sorted && x >= sorterX - 10 && x <= sorterX + 10 && !isSorting) {
                 // Sorter determines the type and changes the image
-                this.image = getImageForType(item.getItemType());
-                sorted = true;
-                sorterCount++;
+                isSorting = true;
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(3000); // Sleep for 3 seconds
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    this.image = getImageForType(item.getItemType());
+                    sorted = true;
+                    isSorting = false;
+                    sorterCount++;
+                }).start();
             }
 
-            if (!sorted) {
+            if (!sorted && isSorting) {
+                // Stop the object during sorting
                 this.y = middleY; // Set the Y position based on the middle line
                 g.setColor(Color.WHITE);
                 g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
             } else {
-                g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
-                g.setColor(Color.BLACK);
-                g.drawString(item.getItemType(), x, y - 25); // Display the item type
+                // Move the object after sorting
+                if (!sorted) {
+                    this.y = middleY; // Set the Y position based on the middle line
+                    g.setColor(Color.WHITE);
+                    g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
+                } else {
+                    g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
+                    g.setColor(Color.BLACK);
+                    g.drawString(item.getItemType(), x, y - 25); // Display the item type
+                }
+                x += 5; // Move right
             }
 
             // Update the position for the next frame
-            x += 5; // Move right
-            if (x > mainBeltEnd && !distributed) { // Use mainBeltEnd instead of getWidth()
-                // Distributor places the object in the respective lane
-                if (x >= distributorX - 10 && x <= distributorX + 10) {
-                    switch (item.getItemType()) {
-                        case "Metal":
-                            y = middleY - 120;
-                            x = mainBeltEnd + 10 + lanePositions[0];
-                            lanePositions[0] += 30; // Space out objects in the lane
-                            metalCount++;
-                            break;
-                        case "Plastic":
-                            y = middleY - 80;
-                            x = mainBeltEnd + 10 + lanePositions[1];
-                            lanePositions[1] += 30; // Space out objects in the lane
-                            plasticCount++;
-                            break;
-                        case "Glass":
-                            y = middleY + 40;
-                            x = mainBeltEnd + 10 + lanePositions[2];
-                            lanePositions[2] += 30; // Space out objects in the lane
-                            glassCount++;
-                            break;
-                        case "Paper":
-                            y = middleY + 80;
-                            x = mainBeltEnd + 10 + lanePositions[3];
-                            lanePositions[3] += 30; // Space out objects in the lane
-                            paperCount++;
-                            break;
+            if (sorted && !distributed) {
+                if (x > mainBeltEnd) { // Use mainBeltEnd instead of getWidth()
+                    // Distributor places the object in the respective lane
+                    if (x >= distributorX - 10 && x <= distributorX + 10) {
+                        switch (item.getItemType()) {
+                            case "Metal":
+                                y = middleY - 120;
+                                x = mainBeltEnd + 10 + lanePositions[0];
+                                lanePositions[0] += 30; // Space out objects in the lane
+                                metalCount++;
+                                break;
+                            case "Plastic":
+                                y = middleY - 80;
+                                x = mainBeltEnd + 10 + lanePositions[1];
+                                lanePositions[1] += 30; // Space out objects in the lane
+                                plasticCount++;
+                                break;
+                            case "Glass":
+                                y = middleY + 40;
+                                x = mainBeltEnd + 10 + lanePositions[2];
+                                lanePositions[2] += 30; // Space out objects in the lane
+                                glassCount++;
+                                break;
+                            case "Paper":
+                                y = middleY + 80;
+                                x = mainBeltEnd + 10 + lanePositions[3];
+                                lanePositions[3] += 30; // Space out objects in the lane
+                                paperCount++;
+                                break;
+                        }
+                        distributed = true;
+                        distributorCount++;
                     }
-                    distributed = true;
-                    distributorCount++;
                 }
             } else if (distributed) {
                 x += 5; // Move right in the lane
