@@ -9,11 +9,12 @@ import java.util.Random;
 public class GUIMain {
     private JFrame frame;
     private JTextField experienceField;
-    private JTextField timescaleField;
     private JTextArea outputArea;
     private RailPanel railPanel;
     private List<MovingObject> movingObjects;
     private Timer timer;
+    private Timer clockTimer;
+    private int timeMultiplier = 1;
     private int metalCount = 0;
     private int plasticCount = 0;
     private int glassCount = 0;
@@ -28,6 +29,9 @@ public class GUIMain {
     private Image glassImage;
     private Image paperImage;
     private boolean isSorting = false;
+    private JLabel timeLabel;
+    private long startTime;
+    private long elapsedTimeBefore = 0;
 
     public GUIMain() {
         frame = new JFrame("Simulation");
@@ -41,19 +45,32 @@ public class GUIMain {
         experienceField = new JTextField();
         inputPanel.add(experienceField);
 
-        inputPanel.add(new JLabel("Timescale:"));
-        timescaleField = new JTextField();
-        inputPanel.add(timescaleField);
+        timeLabel = new JLabel("Time: 00:00:00");
+        inputPanel.add(timeLabel);
+
+        JButton speedUp2xButton = new JButton("x2");
+        JButton speedUp4xButton = new JButton("x4");
+        JButton speedUp8xButton = new JButton("x8");
+        JButton normalSpeedButton = new JButton("Normal");
+
+        inputPanel.add(speedUp2xButton);
+        inputPanel.add(speedUp4xButton);
+        inputPanel.add(speedUp8xButton);
+        inputPanel.add(normalSpeedButton);
+
+        speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
+        speedUp4xButton.addActionListener(e -> setTimeMultiplier(4));
+        speedUp8xButton.addActionListener(e -> setTimeMultiplier(8));
+        normalSpeedButton.addActionListener(e -> setTimeMultiplier(1));
 
         JButton startButton = new JButton("Start");
         inputPanel.add(startButton);
 
         startButton.addActionListener(e -> {
             System.out.println("Start button clicked");
-            if (experienceField.getText().trim().isEmpty() || 
-                timescaleField.getText().trim().isEmpty()) {
+            if (experienceField.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(frame, 
-                    "Please enter both Experience and Timescale values",
+                    "Please enter Experience value",
                     "Input Required",
                     JOptionPane.WARNING_MESSAGE);
                 return;
@@ -87,6 +104,13 @@ public class GUIMain {
         paperImage = new ImageIcon("PAPER.png").getImage();
     }
 
+    private void setTimeMultiplier(int multiplier) {
+        long currentTime = System.currentTimeMillis();
+        elapsedTimeBefore += (currentTime - startTime) * timeMultiplier;
+        startTime = currentTime;
+        this.timeMultiplier = multiplier;
+    }
+
     private void startSimulation() {
         // Add logic to start the simulation
         // For example, create MovingObject instances and add them to the movingObjects list
@@ -115,6 +139,20 @@ public class GUIMain {
         }
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
+
+        startTime = System.currentTimeMillis();
+        clockTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                long currentTime = System.currentTimeMillis();
+                long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                int hours = (int) (elapsedTime / 3600000);
+                int minutes = (int) (elapsedTime / 60000) % 60;
+                int seconds = (int) (elapsedTime / 1000) % 60;
+                timeLabel.setText(String.format("Time: %02d:%02d:%02d", hours, minutes, seconds));
+            }
+        });
+        clockTimer.start();
 
         // Start the timer to move objects
         timer = new Timer(100, new ActionListener() {
