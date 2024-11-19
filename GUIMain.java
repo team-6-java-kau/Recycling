@@ -75,15 +75,15 @@ public class GUIMain {
         movingObjects = new ArrayList<>();
 
         // Load the background image
-        backgroundImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\packaging-closing-machine.jpg").getImage();
+        backgroundImage = new ImageIcon("packaging-closing-machine.jpg").getImage();
         // Load the sorter and distributor images
-        sorterImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\sorter.png").getImage();
-        distributorImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\distbuter.png").getImage();
+        sorterImage = new ImageIcon("sorter.png").getImage();
+        distributorImage = new ImageIcon("distbuter.png").getImage();
         // Load the recyclable item images
-        plasticImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\PLASTIC.png").getImage();
-        metalImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\METEL.png").getImage();
-        glassImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\GLASS.png").getImage();
-        paperImage = new ImageIcon("C:\\Users\\muhap\\OneDrive\\Pictures\\PAPER.png").getImage();
+        plasticImage = new ImageIcon("PLASTIC.png").getImage();
+        metalImage = new ImageIcon("METEL.png").getImage();
+        glassImage = new ImageIcon("GLASS.png").getImage();
+        paperImage = new ImageIcon("PAPER.png").getImage();
     }
 
     private void startSimulation() {
@@ -267,10 +267,16 @@ public class GUIMain {
             }
 
             // Draw the sorter employee
-            g.drawImage(sorterImage, sorterX - 15, middleY - 30, 54, 60, this);
+            g.drawImage(sorterImage, sorterX - 30, middleY - 60, 60, 120, this); // Adjusted sorter image size
             g.setColor(Color.BLACK);
-            g.drawString("Sorter Employee", sorterX - 30, middleY - 40); // Sorter label
-            g.drawString("Sorted: " + sorterCount, sorterX - 30, middleY - 60); // Sorter counter
+            g.drawString("Sorter Employee", sorterX - 30, middleY - 70); // Sorter label
+            g.drawString("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
+
+            // Draw the distributor employee in front of the main path
+            g.drawImage(distributorImage, distributorX - 15, middleY - 50, 30, 60, this);
+            g.setColor(Color.BLACK);
+            g.drawString("Distributor", distributorX - 30, middleY - 60); // Distributor label
+            g.drawString("Distributed: " + distributorCount, distributorX - 30, middleY - 80); // Distributor counter
 
             // Draw the connecting paths to the additional lanes
             g.setColor(Color.DARK_GRAY);
@@ -303,12 +309,6 @@ public class GUIMain {
             g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY - 80); // Plastic wire
             g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY + 40); // Glass wire
             g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY + 80); // Paper wire
-
-            // Draw the distributor employee in front of the main path
-            g.drawImage(distributorImage, distributorX - 15, middleY - 50, 30, 60, this);
-            g.setColor(Color.BLACK);
-            g.drawString("Distributor", distributorX - 30, middleY - 60); // Distributor label
-            g.drawString("Distributed: " + distributorCount, distributorX - 30, middleY - 80); // Distributor counter
 
             // Draw baskets at the end of each lane
             g.setColor(Color.ORANGE);
