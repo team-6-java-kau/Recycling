@@ -3,7 +3,6 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-<<<<<<< Updated upstream
         List<Recyclableitem> items = Recyclableitem.createList(30);
         Scanner input = new Scanner(System.in);
         Integer experience_input = input.nextInt();
@@ -26,35 +25,4 @@ public class Main {
 
         System.out.println("Errors encountered: " + muhammed.errorsNum);
     }
-=======
-        GUIMain gui = new GUIMain();
-        double timescale = 1.0; // Example timescale value
-        Factory factory = new Factory(gui, timescale);
-
-        // Example usage
-        List<Recyclableitem> items = new ArrayList<>();
-        items.add(new Metal(5.0));
-        items.add(new Metal(10.0));
-
-        factory.setTimescale(2.0); // Set timescale
-        factory.processItems(items); // Process items
-
-        // Example manual processing
-        Employee sorter = new Employee("Sorter");
-        Employee distributor = new Employee("Distributor");
-        factory.manual(items, sorter, distributor);
-    }
-}
-
-class Employee {
-    private String role;
-
-    public Employee(String role) {
-        this.role = role;
-    }
-
-    public String getRole() {
-        return role;
-    }
->>>>>>> Stashed changes
 }
