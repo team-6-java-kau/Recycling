@@ -12,7 +12,6 @@ public class GUIMain {
     private JTextArea outputArea;
     private RailPanel railPanel;
     private List<MovingObject> movingObjects;
-    private Timer timer;
     private Timer clockTimer;
     private int timeMultiplier = 1;
     private int metalCount = 0;
@@ -37,6 +36,7 @@ public class GUIMain {
         frame = new JFrame("Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
+        frame.getContentPane().setBackground(Color.decode("#5e5e5e"));
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridLayout(2, 2));
@@ -141,7 +141,7 @@ public class GUIMain {
         railPanel.repaint();
 
         startTime = System.currentTimeMillis();
-        clockTimer = new Timer(1000, new ActionListener() {
+        clockTimer = new Timer(100 / timeMultiplier, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 long currentTime = System.currentTimeMillis();
@@ -150,18 +150,10 @@ public class GUIMain {
                 int minutes = (int) (elapsedTime / 60000) % 60;
                 int seconds = (int) (elapsedTime / 1000) % 60;
                 timeLabel.setText(String.format("Time: %02d:%02d:%02d", hours, minutes, seconds));
+                railPanel.repaint(); // Repaint the rail panel to move objects
             }
         });
         clockTimer.start();
-
-        // Start the timer to move objects
-        timer = new Timer(100, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                railPanel.repaint();
-            }
-        });
-        timer.start();
     }
 
     public void updateSortingStatus(Recyclableitem item, boolean status) {
@@ -213,7 +205,7 @@ public class GUIMain {
                 isSorting = true;
                 new Thread(() -> {
                     try {
-                        Thread.sleep(3000); // Sleep for 3 seconds
+                        Thread.sleep(3000); 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -307,6 +299,7 @@ public class GUIMain {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+            setBackground(Color.decode("#5e5e5e")); // Set the background color
 
             // Draw the background image
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
@@ -331,7 +324,7 @@ public class GUIMain {
             g.drawString("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
 
             // Draw the distributor employee in front of the main path
-            g.drawImage(distributorImage, distributorX - 15, middleY - 50, 30, 60, this);
+            g.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120, this);
             g.setColor(Color.BLACK);
             g.drawString("Distributor", distributorX - 30, middleY - 60); // Distributor label
             g.drawString("Distributed: " + distributorCount, distributorX - 30, middleY - 80); // Distributor counter
@@ -354,7 +347,7 @@ public class GUIMain {
                 g.fillRect(i, middleY + 80, 10, 20); // Paper lane
             }
 
-            // Draw wire lines to connect the lanes with the distributor
+            //Draw wire lines to connect the lanes with the distributor
             g.setColor(Color.DARK_GRAY);
             g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 10, middleY - 120); // Metal wire
             g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 10, middleY - 80); // Plastic wire
@@ -408,6 +401,11 @@ public class GUIMain {
     }
 
     public static void main(String[] args) {
+        List<Recyclableitem> items = Recyclableitem.createList(30);
+        Employee muhammed = new Employee(1, 5.0, "Moha", 10);
+        Employee distributor = new Employee(2, 5.0, "Sara", 3); // Create a distribution employee
+        Factory one = new Factory();
+        one.manual(items, muhammed, distributor); // Pass both employees
         SwingUtilities.invokeLater(GUIMain::new);
     }
 }
