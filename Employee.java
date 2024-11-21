@@ -6,9 +6,9 @@ public class Employee {
     private Double workingHours;
     private String name;
     private Integer experienceYears;
-    Double tiredness;
-    Integer itemsDone;
-    Integer errorsNum;
+    private Double tiredness;
+    private Integer itemsDone;
+    private Integer errorsNum;
   
 
     public Employee(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {

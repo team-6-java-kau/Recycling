@@ -403,7 +403,7 @@ public class GUIMain {
     public static void main(String[] args) {
         List<Recyclableitem> items = Recyclableitem.createList(30);
         Employee muhammed = new Employee(1, 5.0, "Moha", 10);
-        Employee distributor = new Employee(2, 5.0, "Sara", 3); // Create a distribution employee
+        Employee distributor = new Employee(2, 5.0, "spotty", 3); // Create a distribution employee
         Factory one = new Factory();
         one.manual(items, muhammed, distributor); // Pass both employees
         SwingUtilities.invokeLater(GUIMain::new);
