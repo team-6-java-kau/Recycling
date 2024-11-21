@@ -26,3 +26,4 @@ public class Main {
         System.out.println("Errors encountered: " + muhammed.errorsNum);
     }
 }
+/*Hamza */
