@@ -16,22 +16,22 @@ public class Recyclableitem {
         this.itemType = itemType;
         this.sortingError = false;
         this.itemWeight = itemWeight;
-        this.setisdone_distribute(false);
-        this.setisDone_sorting(false);
+        this.setDoneDistribute(false);
+        this.setDoneSorting(false);
         this.time_to_sort = 0.0;
     }
 
     // Getter and Setter methods
     public String getItemType() { return itemType; }
     public void setItemType(String itemType) { this.itemType = itemType; }
-    public boolean getsortingError() { return sortingError; }
-    public void setsortingError(boolean sortingError) { this.sortingError = sortingError; }
+    public boolean getSortingError() { return sortingError; }
+    public void setSortingError(boolean sortingError) { this.sortingError = sortingError; }
     public double getItemWeight() { return itemWeight; }
     public void setItemWeight(double itemWeight) { this.itemWeight = itemWeight; }
-    public boolean isDone_sorting() { return done_sorting; }
-    public void setisDone_sorting(boolean done_sorting) { this.done_sorting = done_sorting; }
-    public boolean isdone_distribute() { return done_distribute; }
-    public void setisdone_distribute(boolean done_distribute) { this.done_distribute = done_distribute; }
+    public boolean isDoneSorting() { return done_sorting; }
+    public void setDoneSorting(boolean done_sorting) { this.done_sorting = done_sorting; }
+    public boolean isDoneDistribute() { return done_distribute; }
+    public void setDoneDistribute(boolean done_distribute) { this.done_distribute = done_distribute; }
     public void set_time_to_sort(double time_to_sort) { this.time_to_sort = time_to_sort; }
     public double get_time_to_sort() { return time_to_sort; }
     public void set_time_to_distribute(double time_to_distribute) { this.time_to_distribute = time_to_distribute; }

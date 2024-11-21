@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.Queue;
 import java.util.LinkedList;
+//import com.example.recycling.Employee;//
 
 public class Factory {
     private static final int MAX_BUFFER_SIZE = 3; // Maximum number of items that can wait between sorting and distribution

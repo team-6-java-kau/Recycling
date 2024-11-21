@@ -1,4 +1,3 @@
-
 import java.util.Random;
 
 public class Employee {
@@ -66,11 +65,11 @@ public class Employee {
         double errorChance = Math.min(0.3, (tiredness * 0.05) - (experienceYears * 0.01)); // Error depends on tiredness and experience
         boolean hasError = random.nextDouble() < errorChance;
         sortTime = Math.round(sortTime * 10.0) / 10.0;
-        recyclable.setisDone_sorting(true);
+        recyclable.setDoneSorting(true); // Correct method name
 
         incrementItemsDone();
         if (hasError) {
-            recyclable.setsortingError(true);
+            recyclable.setSortingError(true); // Correct method name
         }
 
         return !hasError;
@@ -117,4 +116,4 @@ public class Employee {
         }
      }
     }
-  
+    

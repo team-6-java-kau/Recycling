@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,12 +18,12 @@ public class Main {
         if (items != null && !items.isEmpty()) {
             System.out.println("List created successfully with " + items.size() + " items.");
             for (Recyclableitem item : items) {
-                System.out.println(item.getItemType() + " - " +  item.getsortingError() + " - " + item.get_time_to_sort() + " - " + item.getItemWeight());
+                System.out.println(item.getItemType() + " - " +  item.getSortingError() + " - " + item.get_time_to_sort() + " - " + item.getItemWeight());
             }
         } else {
             System.out.println("Failed to create list.");
         }
 
-        System.out.println("Errors encountered: " + muhammed.errorsNum);
+        System.out.println("Errors encountered: " + muhammed.getErrorsNum());
     }
 }
