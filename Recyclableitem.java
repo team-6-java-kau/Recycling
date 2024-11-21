@@ -64,26 +64,3 @@ public class Recyclableitem {
     }
 }
 
-class Glass extends Recyclableitem {
-    public Glass(double itemWeight) {
-        super("Glass", itemWeight);
-    }
-}
-
-class Metal extends Recyclableitem {
-    public Metal(double itemWeight) {
-        super("Metal", itemWeight);
-    }
-}
-
-class Paper extends Recyclableitem {
-    public Paper(double itemWeight) {
-        super("Paper", itemWeight);
-    }
-}
-
-class Plastic extends Recyclableitem {
-    public Plastic(double itemWeight) {
-        super("Plastic", itemWeight);
-    }
-}
