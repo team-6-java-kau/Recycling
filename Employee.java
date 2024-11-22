@@ -66,10 +66,10 @@ public class Employee {
         double errorChance = Math.min(0.3, (tiredness * 0.05) - (experienceYears * 0.01)); // Error depends on tiredness and experience
         boolean hasError = random.nextDouble() < errorChance;
         sortTime = Math.round(sortTime * 10.0) / 10.0;
-        recyclable.setisDone_sorting(true);
+        //recyclable.setisDone_sorting(true);
         recyclable.setItemType_sorter(recyclable.getItemType());
 
-        incrementItemsDone();
+        //incrementItemsDone();
         if (hasError) {
             recyclable.setsortingError(true);
             recyclable.setItemType_sorter(Recyclableitem.createRandomItem());

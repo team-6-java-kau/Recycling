@@ -112,14 +112,16 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(30);
-        movingObjects.clear();
+        List<Recyclableitem> items = Recyclableitem.createList(3);
+        int experienceInput = Integer.parseInt(experienceField.getText().trim());
+        Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
+        Employee distributor = new Employee(2, 5.0, "Sara", 3); 
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
 
         new Thread(() -> {
             for (Recyclableitem item : items) {
-                movingObjects.add(new MovingObject(item, -50)); // Start at a fixed position
+                movingObjects.add(new MovingObject(item, -50, sorter, distributor)); // Pass employees
                 railPanel.repaint();
                 try {
                     Thread.sleep(1000); // Wait for 1 second before adding the next item
@@ -147,32 +149,24 @@ public class GUIMain {
     
    
 
-    public void updateSortingStatus(Recyclableitem item, boolean status) {
-        
-        System.out.println("Sorting status updated for: " + item.getItemType() + " to " + status);
-        item.setisDone_sorting(status);
-    }
-
-    public void updateDistributionStatus(Recyclableitem item) {
-        // Add logic to update distribution status
-        System.out.println("Distribution status updated for: " + item.getItemType());
-        item.setisdone_distribute(true);
-    }
-
     private class MovingObject {
         int x, y;
         Image image;
         Recyclableitem item;
         boolean sorted;
         boolean distributed;
+        Employee sorterEmployee;
+        Employee distributorEmployee;
 
-        MovingObject(Recyclableitem item, int startX) {
+        MovingObject(Recyclableitem item, int startX, Employee sorterEmployee, Employee distributorEmployee) {
             this.item = item;
             this.x = startX; // Starting X position with delay
             this.y = 0; // Y position will be set based on the middle line
-            this.image = getImageForType(item.getItemType_sorter()); // Set the image based on the item type
+            this.image = getImageForType(item.getItemType()); // Set the image based on the item type
             this.sorted = false;
             this.distributed = false;
+            this.sorterEmployee = sorterEmployee;
+            this.distributorEmployee = distributorEmployee;
         }
 
         private Image getImageForType(String itemType) {
@@ -196,23 +190,14 @@ public class GUIMain {
                 isSorting = true;
                 new Thread(() -> {
                     try {
-                        Employee.sortItem(item); // Call the sorting method in Employee class
-                        Thread.sleep(item.getSortingTime()); // Sleep according to the sorting time attribute
+                        sorterEmployee.sort(item); // Use the sort method from Employee class
+                        item.setisDone_sorting(isSorting);
+                        Thread.sleep((long) (item.get_time_to_sort() * 1000)); // Sleep according to the sorting time attribute
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    this.image = getImageForType(item.getItemType());
-                    sorted = true;
-                    isSorting = false;
-                    sorterCount++;
-                }).start();
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(3000); 
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    this.image = getImageForType(item.getItemType());
+                    sorterEmployee.incrementItemsDone();
+                    this.image = getImageForType(item.getItemType_sorter());
                     sorted = true;
                     isSorting = false;
                     sorterCount++;
