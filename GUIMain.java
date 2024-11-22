@@ -191,11 +191,11 @@ public class GUIMain {
                 new Thread(() -> {
                     try {
                         sorterEmployee.sort(item); // Use the sort method from Employee class
-                        item.setisDone_sorting(isSorting);
                         Thread.sleep((long) (item.get_time_to_sort() * 1000)); // Sleep according to the sorting time attribute
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    item.setisDone_sorting(true);
                     sorterEmployee.incrementItemsDone();
                     this.image = getImageForType(item.getItemType_sorter());
                     sorted = true;
