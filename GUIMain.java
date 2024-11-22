@@ -170,7 +170,7 @@ public class GUIMain {
             this.item = item;
             this.x = startX; // Starting X position with delay
             this.y = 0; // Y position will be set based on the middle line
-            this.image = getImageForType(item.getItemType()); // Set the image based on the item type
+            this.image = getImageForType(item.getItemType_sorter()); // Set the image based on the item type
             this.sorted = false;
             this.distributed = false;
         }

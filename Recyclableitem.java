@@ -19,6 +19,7 @@ public class Recyclableitem {
         this.itemWeight = itemWeight;
         this.setisdone_distribute(false);
         this.setisDone_sorting(false);
+        this.setItemType_sorter(itemType);
         this.time_to_sort = 0.0;
     }
 
