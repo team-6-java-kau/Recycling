@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
+
 
 public class GUIMain {
     private JFrame frame;
@@ -112,33 +112,22 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        // Add logic to start the simulation
-        // For example, create MovingObject instances and add them to the movingObjects list
-        Random random = new Random();
-        for (int i = 0; i < 8; i++) {
-            int type = random.nextInt(4);
-            double itemWeight = 0.1 + (2.0 - 0.1) * random.nextDouble();
-            Recyclableitem item;
-            switch (type) {
-                case 0:
-                    item = new Metal(itemWeight);
-                    break;
-                case 1:
-                    item = new Plastic(itemWeight);
-                    break;
-                case 2:
-                    item = new Glass(itemWeight);
-                    break;
-                case 3:
-                    item = new Paper(itemWeight);
-                    break;
-                default:
-                    item = new Metal(itemWeight);
-            }
-            movingObjects.add(new MovingObject(item, i * 100));
-        }
+        List<Recyclableitem> items = Recyclableitem.createList(30);
+        movingObjects.clear();
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
+
+        new Thread(() -> {
+            for (Recyclableitem item : items) {
+                movingObjects.add(new MovingObject(item, -50)); // Start at a fixed position
+                railPanel.repaint();
+                try {
+                    Thread.sleep(1000); // Wait for 1 second before adding the next item
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         startTime = System.currentTimeMillis();
         clockTimer = new Timer(100 / timeMultiplier, new ActionListener() {
@@ -155,6 +144,8 @@ public class GUIMain {
         });
         clockTimer.start();
     }
+    
+   
 
     public void updateSortingStatus(Recyclableitem item, boolean status) {
         // Add logic to update sorting status
