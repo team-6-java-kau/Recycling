@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Recyclableitem {
+public abstract class Recyclableitem {
     private String itemType;
     private Boolean sortingError;
     private double itemWeight;
@@ -36,6 +36,10 @@ public class Recyclableitem {
     public double get_time_to_sort() { return time_to_sort; }
     public void set_time_to_distribute(double time_to_distribute) { this.time_to_distribute = time_to_distribute; }
     public double get_time_to_distribute() { return time_to_distribute; }
+    public double getWeight() {
+        return itemWeight;
+    }
+
     // Method to create a list of Recycle objects
     public static List<Recyclableitem> createList(int number) {
         List<Recyclableitem> items = new ArrayList<>();

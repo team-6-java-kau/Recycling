@@ -38,6 +38,7 @@ public class GUIMain {
     private long startTime;
     private long elapsedTimeBefore = 0;
     private JFXPanel fxPanel;
+    private JLabel weightLabel;
 
     public GUIMain() {
         frame = new JFrame("Simulation");
@@ -114,6 +115,9 @@ public class GUIMain {
         fxPanel = new JFXPanel();
         frame.add(fxPanel, BorderLayout.CENTER);
         Platform.runLater(this::initFX);
+
+        weightLabel = new JLabel("Current Item Weight: 0.0");
+        inputPanel.add(weightLabel);
     }
 
     private void initFX() {
@@ -127,6 +131,13 @@ public class GUIMain {
         elapsedTimeBefore += (currentTime - startTime) * timeMultiplier;
         startTime = currentTime;
         this.timeMultiplier = multiplier;
+        if (clockTimer != null) {
+            clockTimer.setDelay(100 / timeMultiplier);
+        }
+    }
+
+    private int calculateDistributeTime(double weight) {
+        return (int) (1000 + weight * 500); // Base time of 1000ms plus 500ms per unit weight
     }
 
     private void startSimulation() {
@@ -177,13 +188,13 @@ public class GUIMain {
     public void updateSortingStatus(Recyclableitem item, boolean status) {
         // Add logic to update sorting status
         System.out.println("Sorting status updated for: " + item.getItemType() + " to " + status);
-        item.setDoneSorting(status);
+        item.setDoneSorting(status); // Correct method name
     }
 
     public void updateDistributionStatus(Recyclableitem item) {
         // Add logic to update distribution status
         System.out.println("Distribution status updated for: " + item.getItemType());
-        item.setDoneDistribute(true);
+        item.setDoneDistribute(true); // Correct method name
     }
 
     private class MovingObject {
@@ -258,34 +269,43 @@ public class GUIMain {
                 if (x > mainBeltEnd) { // Use mainBeltEnd instead of getWidth()
                     // Distributor places the object in the respective lane
                     if (x >= distributorX - 10 && x <= distributorX + 10) {
-                        switch (item.getItemType()) {
-                            case "Metal":
-                                y = middleY - 120;
-                                x = mainBeltEnd + 10 + lanePositions[0];
-                                lanePositions[0] += 30; // Space out objects in the lane
-                                metalCount++;
-                                break;
-                            case "Plastic":
-                                y = middleY - 80;
-                                x = mainBeltEnd + 10 + lanePositions[1];
-                                lanePositions[1] += 30; // Space out objects in the lane
-                                plasticCount++;
-                                break;
-                            case "Glass":
-                                y = middleY + 40;
-                                x = mainBeltEnd + 10 + lanePositions[2];
-                                lanePositions[2] += 30; // Space out objects in the lane
-                                glassCount++;
-                                break;
-                            case "Paper":
-                                y = middleY + 80;
-                                x = mainBeltEnd + 10 + lanePositions[3];
-                                lanePositions[3] += 30; // Space out objects in the lane
-                                paperCount++;
-                                break;
-                        }
-                        distributed = true;
-                        distributorCount++;
+                        weightLabel.setText("Current Item Weight: " + item.getWeight());
+                        int distributeTime = calculateDistributeTime(item.getWeight());
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(distributeTime);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            switch (item.getItemType()) {
+                                case "Metal":
+                                    y = middleY - 120;
+                                    x = mainBeltEnd + 10 + lanePositions[0];
+                                    lanePositions[0] += 30; // Space out objects in the lane
+                                    metalCount++;
+                                    break;
+                                case "Plastic":
+                                    y = middleY - 80;
+                                    x = mainBeltEnd + 10 + lanePositions[1];
+                                    lanePositions[1] += 30; // Space out objects in the lane
+                                    plasticCount++;
+                                    break;
+                                case "Glass":
+                                    y = middleY + 40;
+                                    x = mainBeltEnd + 10 + lanePositions[2];
+                                    lanePositions[2] += 30; // Space out objects in the lane
+                                    glassCount++;
+                                    break;
+                                case "Paper":
+                                    y = middleY + 80;
+                                    x = mainBeltEnd + 10 + lanePositions[3];
+                                    lanePositions[3] += 30; // Space out objects in the lane
+                                    paperCount++;
+                                    break;
+                            }
+                            distributed = true;
+                            distributorCount++;
+                        }).start();
                     }
                 }
             } else if (distributed) {
