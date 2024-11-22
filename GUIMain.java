@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-// import javafx.scene.paint.Color; // Remove this import as it is not needed
 
 
 public class GUIMain {
@@ -37,8 +31,6 @@ public class GUIMain {
     private JLabel timeLabel;
     private long startTime;
     private long elapsedTimeBefore = 0;
-    private JFXPanel fxPanel;
-    private JLabel weightLabel;
 
     public GUIMain() {
         frame = new JFrame("Simulation");
@@ -101,29 +93,15 @@ public class GUIMain {
         movingObjects = new ArrayList<>();
 
         // Load the background image
-        backgroundImage = new ImageIcon(getClass().getResource("/images/packaging-closing-machine.jpg")).getImage();
+        backgroundImage = new ImageIcon("packaging-closing-machine.jpg").getImage();
         // Load the sorter and distributor images
-        sorterImage = new ImageIcon(getClass().getResource("/images/sorter.png")).getImage();
-        distributorImage = new ImageIcon(getClass().getResource("/images/distributor.png")).getImage();
+        sorterImage = new ImageIcon("sorter.png").getImage();
+        distributorImage = new ImageIcon("distbuter.png").getImage();
         // Load the recyclable item images
-        plasticImage = new ImageIcon(getClass().getResource("/images/PLASTIC.png")).getImage();
-        metalImage = new ImageIcon(getClass().getResource("/images/METAL.png")).getImage();
-        glassImage = new ImageIcon(getClass().getResource("/images/GLASS.png")).getImage();
-        paperImage = new ImageIcon(getClass().getResource("/images/PAPER.png")).getImage();
-
-        // Initialize JavaFX
-        fxPanel = new JFXPanel();
-        frame.add(fxPanel, BorderLayout.CENTER);
-        Platform.runLater(this::initFX);
-
-        weightLabel = new JLabel("Current Item Weight: 0.0");
-        inputPanel.add(weightLabel);
-    }
-
-    private void initFX() {
-        Pane root = new Pane();
-        Scene scene = new Scene(root, 800, 600);
-        fxPanel.setScene(scene);
+        plasticImage = new ImageIcon("PLASTIC.png").getImage();
+        metalImage = new ImageIcon("METEL.png").getImage();
+        glassImage = new ImageIcon("GLASS.png").getImage();
+        paperImage = new ImageIcon("PAPER.png").getImage();
     }
 
     private void setTimeMultiplier(int multiplier) {
@@ -136,38 +114,23 @@ public class GUIMain {
         }
     }
 
-    private int calculateDistributeTime(double weight) {
-        return (int) (1000 + weight * 500); // Base time of 1000ms plus 500ms per unit weight
-    }
-
     private void startSimulation() {
-        // Add logic to start the simulation
-        // For example, create MovingObject instances and add them to the movingObjects list
-        Random random = new Random();
-        for (int i = 0; i < 8; i++) {
-            int type = random.nextInt(4);
-            double itemWeight = 0.1 + (2.0 - 0.1) * random.nextDouble();
-            Recyclableitem item;
-            switch (type) {
-                case 0:
-                    item = new Metal(itemWeight);
-                    break;
-                case 1:
-                    item = new Plastic(itemWeight);
-                    break;
-                case 2:
-                    item = new Glass(itemWeight);
-                    break;
-                case 3:
-                    item = new Paper(itemWeight);
-                    break;
-                default:
-                    item = new Metal(itemWeight);
-            }
-            movingObjects.add(new MovingObject(item, i * 100));
-        }
+        List<Recyclableitem> items = Recyclableitem.createList(30);
+        movingObjects.clear();
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
+
+        new Thread(() -> {
+            for (Recyclableitem item : items) {
+                movingObjects.add(new MovingObject(item, -50)); // Start at a fixed position
+                railPanel.repaint();
+                try {
+                    Thread.sleep(1000); // Wait for 1 second before adding the next item
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         startTime = System.currentTimeMillis();
         clockTimer = new Timer(100 / timeMultiplier, new ActionListener() {
@@ -184,17 +147,19 @@ public class GUIMain {
         });
         clockTimer.start();
     }
+    
+   
 
     public void updateSortingStatus(Recyclableitem item, boolean status) {
         // Add logic to update sorting status
         System.out.println("Sorting status updated for: " + item.getItemType() + " to " + status);
-        item.setDoneSorting(status); // Correct method name
+        item.setisDone_sorting(status);
     }
 
     public void updateDistributionStatus(Recyclableitem item) {
         // Add logic to update distribution status
         System.out.println("Distribution status updated for: " + item.getItemType());
-        item.setDoneDistribute(true); // Correct method name
+        item.setisdone_distribute(true);
     }
 
     private class MovingObject {
@@ -208,7 +173,7 @@ public class GUIMain {
             this.item = item;
             this.x = startX; // Starting X position with delay
             this.y = 0; // Y position will be set based on the middle line
-            this.image = getImageForType(item.getItemType()); // Set the image based on the item type
+            this.image = getImageForType(item.getItemType_sorter()); // Set the image based on the item type
             this.sorted = false;
             this.distributed = false;
         }
@@ -248,20 +213,20 @@ public class GUIMain {
             if (!sorted && isSorting) {
                 // Stop the object during sorting
                 this.y = middleY; // Set the Y position based on the middle line
-                g.setColor(java.awt.Color.WHITE);
+                g.setColor(Color.WHITE);
                 g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
             } else {
                 // Move the object after sorting
                 if (!sorted) {
                     this.y = middleY; // Set the Y position based on the middle line
-                    g.setColor(java.awt.Color.WHITE);
+                    g.setColor(Color.WHITE);
                     g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
                 } else {
                     g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
-                    g.setColor(java.awt.Color.BLACK);
+                    g.setColor(Color.BLACK);
                     g.drawString(item.getItemType(), x, y - 25); // Display the item type
                 }
-                x += 5 * timeMultiplier; // Move right, adjusted by timeMultiplier
+                x += 5 * timeMultiplier; // Sync object speed with time multiplier
             }
 
             // Update the position for the next frame
@@ -269,47 +234,38 @@ public class GUIMain {
                 if (x > mainBeltEnd) { // Use mainBeltEnd instead of getWidth()
                     // Distributor places the object in the respective lane
                     if (x >= distributorX - 10 && x <= distributorX + 10) {
-                        weightLabel.setText("Current Item Weight: " + item.getWeight());
-                        int distributeTime = calculateDistributeTime(item.getWeight());
-                        new Thread(() -> {
-                            try {
-                                Thread.sleep(distributeTime);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            switch (item.getItemType()) {
-                                case "Metal":
-                                    y = middleY - 120;
-                                    x = mainBeltEnd + 10 + lanePositions[0];
-                                    lanePositions[0] += 30; // Space out objects in the lane
-                                    metalCount++;
-                                    break;
-                                case "Plastic":
-                                    y = middleY - 80;
-                                    x = mainBeltEnd + 10 + lanePositions[1];
-                                    lanePositions[1] += 30; // Space out objects in the lane
-                                    plasticCount++;
-                                    break;
-                                case "Glass":
-                                    y = middleY + 40;
-                                    x = mainBeltEnd + 10 + lanePositions[2];
-                                    lanePositions[2] += 30; // Space out objects in the lane
-                                    glassCount++;
-                                    break;
-                                case "Paper":
-                                    y = middleY + 80;
-                                    x = mainBeltEnd + 10 + lanePositions[3];
-                                    lanePositions[3] += 30; // Space out objects in the lane
-                                    paperCount++;
-                                    break;
-                            }
-                            distributed = true;
-                            distributorCount++;
-                        }).start();
+                        switch (item.getItemType()) {
+                            case "Metal":
+                                y = middleY - 120;
+                                x = mainBeltEnd + 10 + lanePositions[0];
+                                lanePositions[0] += 30; // Space out objects in the lane
+                                metalCount++;
+                                break;
+                            case "Plastic":
+                                y = middleY - 80;
+                                x = mainBeltEnd + 10 + lanePositions[1];
+                                lanePositions[1] += 30; // Space out objects in the lane
+                                plasticCount++;
+                                break;
+                            case "Glass":
+                                y = middleY + 40;
+                                x = mainBeltEnd + 10 + lanePositions[2];
+                                lanePositions[2] += 30; // Space out objects in the lane
+                                glassCount++;
+                                break;
+                            case "Paper":
+                                y = middleY + 80;
+                                x = mainBeltEnd + 10 + lanePositions[3];
+                                lanePositions[3] += 30; // Space out objects in the lane
+                                paperCount++;
+                                break;
+                        }
+                        distributed = true;
+                        distributorCount++;
                     }
                 }
             } else if (distributed) {
-                x += 5 * timeMultiplier; // Move right in the lane, adjusted by timeMultiplier
+                x += 5 * timeMultiplier; // Sync object speed with time multiplier
                 if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
                     x = mainBeltEnd + 150; // Stop at the basket
                 }
@@ -416,16 +372,20 @@ public class GUIMain {
 
             // Draw the big squares for hours of working and plastic sorted
             g.setColor(Color.WHITE);
-            g.fillRect(sorterX - 30, middleY - 150, 60, 60); // Hours of working square
-            g.fillRect(distributorX - 30, middleY - 150, 60, 60); // Plastic sorted square
+            g.fillRect(sorterX - 150, middleY - 200, 200, 100); // Square for hours of working
+            g.fillRect(sorterX + 50, middleY - 200, 200, 100); // Square for plastic sorted
 
-            // Draw the text inside the big squares
             g.setColor(Color.BLACK);
-            g.setFont(new Font("Times New Roman", Font.BOLD, 14));
-            g.drawString("Hours of", sorterX - 20, middleY - 130);
-            g.drawString("Working", sorterX - 20, middleY - 110);
-            g.drawString("Plastic", distributorX - 20, middleY - 130);
-            g.drawString("Sorted", distributorX - 20, middleY - 110);
+            g.drawRect(sorterX - 150, middleY - 200, 200, 100); // Border for hours of working
+            g.drawRect(sorterX + 50, middleY - 200, 200, 100); // Border for plastic sorted
+
+            g.drawString("Hours of Working", sorterX - 140, middleY - 180);
+            g.drawString("Plastic Sorted: " + plasticCount, sorterX + 60, middleY - 180);
+
+            // Calculate and display hours of working based on total items sorted and distributed
+            int totalItemsProcessed = sorterCount + distributorCount;
+            int hoursOfWorking = totalItemsProcessed / 25;
+            g.drawString("Hours: " + hoursOfWorking, sorterX - 140, middleY - 160);
 
             // Draw the moving objects
             for (MovingObject obj : movingObjects) {
@@ -435,6 +395,11 @@ public class GUIMain {
     }
 
     public static void main(String[] args) {
+        List<Recyclableitem> items = Recyclableitem.createList(30);
+        Employee muhammed = new Employee(1, 5.0, "Moha", 10);
+        Employee distributor = new Employee(2, 5.0, "spotty", 3); // Create a distribution employee
+        Factory one = new Factory();
+        one.manual(items, muhammed, distributor); // Pass both employees
         SwingUtilities.invokeLater(GUIMain::new);
     }
 }
