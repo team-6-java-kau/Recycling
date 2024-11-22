@@ -196,6 +196,18 @@ public class GUIMain {
                 isSorting = true;
                 new Thread(() -> {
                     try {
+                        Employee.sortItem(item); // Call the sorting method in Employee class
+                        Thread.sleep(item.getSortingTime()); // Sleep according to the sorting time attribute
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    this.image = getImageForType(item.getItemType());
+                    sorted = true;
+                    isSorting = false;
+                    sorterCount++;
+                }).start();
+                new Thread(() -> {
+                    try {
                         Thread.sleep(3000); 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
