@@ -96,12 +96,12 @@ public class GUIMain {
         backgroundImage = new ImageIcon("packaging-closing-machine.jpg").getImage();
         // Load the sorter and distributor images
         sorterImage = new ImageIcon("sorter.png").getImage();
-        distributorImage = new ImageIcon("distbuter.png").getImage();
+        distributorImage = new ImageIcon("distributor.png").getImage();
         // Load the recyclable item images
-        plasticImage = new ImageIcon("PLASTIC.png").getImage();
-        metalImage = new ImageIcon("METEL.png").getImage();
-        glassImage = new ImageIcon("GLASS.png").getImage();
-        paperImage = new ImageIcon("PAPER.png").getImage();
+        plasticImage = new ImageIcon("plastic.png").getImage();
+        metalImage = new ImageIcon("metal.png").getImage();
+        glassImage = new ImageIcon("glass.png").getImage();
+        paperImage = new ImageIcon("paper.png").getImage();
     }
 
     private void setTimeMultiplier(int multiplier) {
@@ -153,13 +153,13 @@ public class GUIMain {
     public void updateSortingStatus(Recyclableitem item, boolean status) {
         // Add logic to update sorting status
         System.out.println("Sorting status updated for: " + item.getItemType() + " to " + status);
-        item.setisDone_sorting(status);
+        item.setDoneSorting(status);
     }
 
     public void updateDistributionStatus(Recyclableitem item) {
         // Add logic to update distribution status
         System.out.println("Distribution status updated for: " + item.getItemType());
-        item.setisdone_distribute(true);
+        item.setDoneDistribute(true);
     }
 
     private class MovingObject {
@@ -173,7 +173,7 @@ public class GUIMain {
             this.item = item;
             this.x = startX; // Starting X position with delay
             this.y = 0; // Y position will be set based on the middle line
-            this.image = getImageForType(item.getItemType_sorter()); // Set the image based on the item type
+            this.image = getImageForType(item.getItemType()); // Set the image based on the item type
             this.sorted = false;
             this.distributed = false;
         }
