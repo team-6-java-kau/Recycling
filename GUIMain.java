@@ -50,17 +50,14 @@ public class GUIMain {
 
         JButton speedUp2xButton = new JButton("x2");
         JButton speedUp4xButton = new JButton("x4");
-        JButton speedUp8xButton = new JButton("x8");
         JButton normalSpeedButton = new JButton("Normal");
 
         inputPanel.add(speedUp2xButton);
         inputPanel.add(speedUp4xButton);
-        inputPanel.add(speedUp8xButton);
         inputPanel.add(normalSpeedButton);
 
         speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
         speedUp4xButton.addActionListener(e -> setTimeMultiplier(4));
-        speedUp8xButton.addActionListener(e -> setTimeMultiplier(8));
         normalSpeedButton.addActionListener(e -> setTimeMultiplier(1));
 
         JButton startButton = new JButton("Start");
@@ -112,7 +109,7 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(3);
+        List<Recyclableitem> items = Recyclableitem.createList(15);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
         Employee distributor = new Employee(2, 5.0, "Sara", 3); 
@@ -157,6 +154,7 @@ public class GUIMain {
         boolean distributed;
         Employee sorterEmployee;
         Employee distributorEmployee;
+        boolean isDistributing = false;
 
         MovingObject(Recyclableitem item, int startX, Employee sorterEmployee, Employee distributorEmployee) {
             this.item = item;
@@ -191,7 +189,7 @@ public class GUIMain {
                 new Thread(() -> {
                     try {
                         sorterEmployee.sort(item); // Use the sort method from Employee class
-                        Thread.sleep((long) (item.get_time_to_sort() * 1000)); // Sleep according to the sorting time attribute
+                        Thread.sleep((long) ((item.get_time_to_sort() * 1000) / timeMultiplier)); // Sleep according to the sorting time attribute
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -220,14 +218,20 @@ public class GUIMain {
                     g.setColor(Color.BLACK);
                     g.drawString(item.getItemType(), x, y - 25); // Display the item type
                 }
-                x += 5; // Move right
+                x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
             }
 
             // Update the position for the next frame
             if (sorted && !distributed) {
-                if (x > mainBeltEnd) { // Use mainBeltEnd instead of getWidth()
-                    // Distributor places the object in the respective lane
-                    if (x >= distributorX - 10 && x <= distributorX + 10) {
+                if (x >= distributorX - 10 && x <= distributorX + 10 && !isDistributing) {
+                    // Distributor determines the lane and changes the position
+                    isDistributing = true;
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(1000); // Wait for 1 second before distributing
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         switch (item.getItemType()) {
                             case "Metal":
                                 y = middleY - 120;
@@ -256,10 +260,11 @@ public class GUIMain {
                         }
                         distributed = true;
                         distributorCount++;
-                    }
+                        isDistributing = false;
+                    }).start();
                 }
             } else if (distributed) {
-                x += 5; // Move right in the lane
+                x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
                 if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
                     x = mainBeltEnd + 150; // Stop at the basket
                 }
