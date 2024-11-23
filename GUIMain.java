@@ -35,7 +35,8 @@ public class GUIMain {
     public GUIMain() {
         frame = new JFrame("Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(1300, 900); // Set to HD resolution
+        frame.setResizable(false); // Make the window fixed size
         frame.getContentPane().setBackground(Color.decode("#5e5e5e"));
 
         JPanel inputPanel = new JPanel();
@@ -199,6 +200,7 @@ public class GUIMain {
                     sorted = true;
                     isSorting = false;
                     sorterCount++;
+                    SwingUtilities.invokeLater(() -> outputArea.append("Sorted: " + item.getItemType_sorter() + "\n"));
                 }).start();
             }
 
@@ -261,6 +263,7 @@ public class GUIMain {
                         distributed = true;
                         distributorCount++;
                         isDistributing = false;
+                        SwingUtilities.invokeLater(() -> outputArea.append("Distributed: " + item.getItemType() + "\n"));
                     }).start();
                 }
             } else if (distributed) {
@@ -340,19 +343,7 @@ public class GUIMain {
                 g.fillRect(i, middleY + 80, 10, 20); // Paper lane
             }
 
-            //Draw wire lines to connect the lanes with the distributor
-            g.setColor(Color.DARK_GRAY);
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 10, middleY - 120); // Metal wire
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 10, middleY - 80); // Plastic wire
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 10, middleY + 40); // Glass wire
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 10, middleY + 80); // Paper wire
 
-            // Draw additional wire lines to make them thicker at the end of the distributor object
-            g.setColor(Color.BLACK);
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY - 120); // Metal wire
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY - 80); // Plastic wire
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY + 40); // Glass wire
-            g.drawLine(mainBeltEnd + 10, middleY, mainBeltEnd + 20, middleY + 80); // Paper wire
 
             // Draw baskets at the end of each lane
             g.setColor(Color.ORANGE);
