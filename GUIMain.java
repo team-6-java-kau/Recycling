@@ -27,6 +27,7 @@ public class GUIMain {
     private Image metalImage;
     private Image glassImage;
     private Image paperImage;
+    private Image errorImage;
     private boolean isSorting = false;
     private JLabel timeLabel;
     private long startTime;
@@ -100,6 +101,7 @@ public class GUIMain {
         metalImage = new ImageIcon("METEL.png").getImage();
         glassImage = new ImageIcon("GLASS.png").getImage();
         paperImage = new ImageIcon("PAPER.png").getImage();
+        errorImage = new ImageIcon("error.png").getImage();
     }
 
     private void setTimeMultiplier(int multiplier) {
@@ -178,6 +180,8 @@ public class GUIMain {
                     return glassImage;
                 case "Paper":
                     return paperImage;
+                case "error":
+                    return errorImage;
                 default:
                     return null;
             }
@@ -196,7 +200,13 @@ public class GUIMain {
                     }
                     item.setisDone_sorting(true); // Mark the item as sorted
                     sorterEmployee.incrementItemsDone(); // Increment the sorter's item count
-                    this.image = getImageForType(item.getItemType()); // Update the image based on sorted type
+                    if (item.getsortingError()){
+                        this.image = getImageForType("error"); // Update the image based on sorted type
+                    }
+                    else{
+                        this.image = getImageForType(item.getItemType()); // Update the image based on sorted type
+                    }
+
                     isSorting = false; // Reset the sorting flag
                     sorterCount++; // Increment the sorter count
                     SwingUtilities.invokeLater(() -> outputArea.append("Sorted: " + item.getItemType() + "\n")); // Print sorted message
