@@ -67,12 +67,12 @@ public class Employee {
         boolean hasError = random.nextDouble() < errorChance;
         sortTime = Math.round(sortTime * 10.0) / 10.0;
         //recyclable.setisDone_sorting(true);
-        recyclable.setItemType_sorter(recyclable.getItemType());
+        //recyclable.setItemType_sorter(recyclable.getItemType());
 
         //incrementItemsDone();
         if (hasError) {
             recyclable.setsortingError(true);
-            recyclable.setItemType_sorter(Recyclableitem.createRandomItem());
+            //recyclable.setItemType_sorter(Recyclableitem.createRandomItem());
 
         }
 
