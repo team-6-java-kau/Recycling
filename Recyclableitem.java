@@ -4,14 +4,13 @@ import java.util.Random;
 
 public class Recyclableitem {
     private String itemType;
+    private String itemType_sorter;
     private Boolean sortingError;
     private double itemWeight;
     private boolean done_sorting;
     private boolean done_distribute;
     private double time_to_sort;
     private double time_to_distribute;
-
-
 
     // Constructor
     public Recyclableitem(String itemType, double itemWeight) {
@@ -20,6 +19,7 @@ public class Recyclableitem {
         this.itemWeight = itemWeight;
         this.setisdone_distribute(false);
         this.setisDone_sorting(false);
+        this.setItemType_sorter(itemType);
         this.time_to_sort = 0.0;
     }
 
@@ -38,6 +38,8 @@ public class Recyclableitem {
     public double get_time_to_sort() { return time_to_sort; }
     public void set_time_to_distribute(double time_to_distribute) { this.time_to_distribute = time_to_distribute; }
     public double get_time_to_distribute() { return time_to_distribute; }
+    public String getItemType_sorter() { return itemType_sorter; }
+    public void setItemType_sorter(String itemType_sorter) { this.itemType_sorter = itemType_sorter; }
     // Method to create a list of Recycle objects
     public static List<Recyclableitem> createList(int number) {
         List<Recyclableitem> items = new ArrayList<>();
@@ -63,6 +65,24 @@ public class Recyclableitem {
             }
         }
         return items;
+    }
+
+    public static String createRandomItem() {
+        Random random = new Random();
+        int type = random.nextInt(4);
+
+        switch (type) {
+            case 0:
+                return "Plastic";
+            case 1:
+                return "Metal";
+            case 2:
+                return "Glass";
+            case 3:
+                return "Paper";
+            default:
+                return null;
+        }
     }
 }
 

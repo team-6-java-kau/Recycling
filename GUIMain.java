@@ -1,189 +1,421 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.function.Consumer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class GUIMain {
     private JFrame frame;
-    private JTextArea resultArea;
-    private Employee sortingEmployee;
-    private ItemPanel itemPanel;
-    private Timer itemGenerationTimer;
-    private List<MovingItem> movingItems; // List to hold multiple moving items
-    private String[] itemTypes = {"Plastic", "Metal", "Glass", "Paper"}; // Available item types
-    private Color[] itemColors = {Color.BLUE, Color.GRAY, Color.GREEN, Color.YELLOW}; // Colors for each material
-    private int laneWidth = 150; // Width of each lane
-    private int laneHeight = 120; // Height of each lane
-    private int[] sortedCounts = new int[itemTypes.length]; // Count of sorted items per type
+    private JTextField experienceField;
+    private JTextArea outputArea;
+    private RailPanel railPanel;
+    private List<MovingObject> movingObjects;
+    private Timer clockTimer;
+    private int timeMultiplier = 1;
+    private int metalCount = 0;
+    private int plasticCount = 0;
+    private int glassCount = 0;
+    private int paperCount = 0;
+    private int sorterCount = 0;
+    private int distributorCount = 0;
+    private Image backgroundImage;
+    private Image sorterImage;
+    private Image distributorImage;
+    private Image plasticImage;
+    private Image metalImage;
+    private Image glassImage;
+    private Image paperImage;
+    private Image errorImage;
+    private boolean isSorting = false;
+    private JLabel timeLabel;
+    private long startTime;
+    private long elapsedTimeBefore = 0;
 
     public GUIMain() {
-        // Initialize employee
-        sortingEmployee = new Employee(1, 0.0, "Sorting Employee", 5);
-        movingItems = new ArrayList<>(); // Initialize the list of moving items
-
-        // Create the main frame with larger dimensions
-        frame = new JFrame("Recycling Simulator");
+        frame = new JFrame("Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 500); // Increased size of the frame
-        frame.setLayout(new FlowLayout());
+        frame.setSize(1300, 900); // Set to HD resolution
+        frame.setResizable(false); // Make the window fixed size
+        frame.getContentPane().setBackground(Color.decode("#5e5e5e"));
 
-        // Text area to display results
-        resultArea = new JTextArea(10, 40); // Increased width of text area
-        resultArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(resultArea);
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(2, 2));
 
-        // Item panel for drawing with larger size
-        itemPanel = new ItemPanel();
-        itemPanel.setPreferredSize(new Dimension(600, 350)); // Increased size of item panel
+        inputPanel.add(new JLabel("Experience:"));
+        experienceField = new JTextField();
+        inputPanel.add(experienceField);
 
-        // Start the item generation timer
-        itemGenerationTimer = new Timer(2000, e -> generateNewItem());
-        itemGenerationTimer.start(); // Start generating items every 2 seconds
+        timeLabel = new JLabel("Time: 00:00:00");
+        inputPanel.add(timeLabel);
 
-        // Add components to the frame
-        frame.add(scrollPane);
-        frame.add(itemPanel);
+        JButton speedUp2xButton = new JButton("x2");
+        JButton speedUp4xButton = new JButton("x4");
+        JButton normalSpeedButton = new JButton("Normal");
+
+        inputPanel.add(speedUp2xButton);
+        inputPanel.add(speedUp4xButton);
+        inputPanel.add(normalSpeedButton);
+
+        speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
+        speedUp4xButton.addActionListener(e -> setTimeMultiplier(4));
+        normalSpeedButton.addActionListener(e -> setTimeMultiplier(1));
+
+        JButton startButton = new JButton("Start");
+        inputPanel.add(startButton);
+
+        startButton.addActionListener(e -> {
+            System.out.println("Start button clicked");
+            if (experienceField.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Please enter Experience value",
+                    "Input Required",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            startSimulation();
+        });
+
+        railPanel = new RailPanel();
+        frame.add(railPanel, BorderLayout.CENTER);
+
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        scrollPane.setPreferredSize(new Dimension(200, frame.getHeight()));
+        frame.add(scrollPane, BorderLayout.EAST);
+
+        frame.add(inputPanel, BorderLayout.NORTH);
         frame.setVisible(true);
+
+        movingObjects = new ArrayList<>();
+
+        // Load the background image
+        backgroundImage = new ImageIcon("packaging-closing-machine.jpg").getImage();
+        // Load the sorter and distributor images
+        sorterImage = new ImageIcon("sorter.png").getImage();
+        distributorImage = new ImageIcon("distbuter.png").getImage();
+        // Load the recyclable item images
+        plasticImage = new ImageIcon("PLASTIC.png").getImage();
+        metalImage = new ImageIcon("METEL.png").getImage();
+        glassImage = new ImageIcon("GLASS.png").getImage();
+        paperImage = new ImageIcon("PAPER.png").getImage();
+        errorImage = new ImageIcon("error.png").getImage();
     }
 
-    private void generateNewItem() {
-        // Randomly select an item type
-        int randomIndex = new Random().nextInt(itemTypes.length);
-        Color itemColor = itemColors[randomIndex]; // Get corresponding color
-        double itemWeight = new Random().nextDouble() * 2; // Random weight between 0 and 2
-
-        // Create a new moving item and add it to the list
-        MovingItem item = new MovingItem(randomIndex, itemColor, itemWeight);
-        movingItems.add(item); // Add the new item to the list
-        item.startMovement(itemPanel, this::itemSorted); // Start moving the item
+    private void setTimeMultiplier(int multiplier) {
+        long currentTime = System.currentTimeMillis();
+        elapsedTimeBefore += (currentTime - startTime) * timeMultiplier;
+        startTime = currentTime;
+        this.timeMultiplier = multiplier;
     }
 
-    private void itemSorted(MovingItem item) {
-        int materialIndex = item.getMaterialIndex();
-        sortedCounts[materialIndex]++; // Increment sorted count for the material
-        boolean sortedSuccessfully = sortingEmployee.sort(item.getRecyclableItem()); // Sort the item
-        if (sortedSuccessfully) {
-            resultArea.append(item.getItemType() + " sorted successfully.\n");
-        } else {
-            resultArea.append(item.getItemType() + " sorting failed.\n");
+    private void startSimulation() {
+        List<Recyclableitem> items = Recyclableitem.createList(3);
+        int experienceInput = Integer.parseInt(experienceField.getText().trim());
+        Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
+        Employee distributor = new Employee(2, 5.0, "Sara", 3); 
+        railPanel.setMovingObjects(movingObjects);
+        railPanel.repaint();
+
+        new Thread(() -> {
+            for (Recyclableitem item : items) {
+                movingObjects.add(new MovingObject(item, -50, sorter, distributor)); // Pass employees
+                railPanel.repaint();
+                try {
+                    Thread.sleep(1000); // Wait for 1 second before adding the next item
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        startTime = System.currentTimeMillis();
+        clockTimer = new Timer(100 / timeMultiplier, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                long currentTime = System.currentTimeMillis();
+                long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                int hours = (int) (elapsedTime / 3600000);
+                int minutes = (int) (elapsedTime / 60000) % 60;
+                int seconds = (int) (elapsedTime / 1000) % 60;
+                timeLabel.setText(String.format("Time: %02d:%02d:%02d", hours, minutes, seconds));
+                railPanel.repaint(); // Repaint the rail panel to move objects
+            }
+        });
+        clockTimer.start();
+    }
+    
+   
+
+    private class MovingObject {
+        int x, y;
+        Image image;
+        Recyclableitem item;
+        boolean sorted;
+        boolean distributed;
+        Employee sorterEmployee;
+        Employee distributorEmployee;
+        boolean isDistributing = false;
+
+        MovingObject(Recyclableitem item, int startX, Employee sorterEmployee, Employee distributorEmployee) {
+            this.item = item;
+            this.x = startX; // Starting X position with delay
+            this.y = 0; // Y position will be set based on the middle line
+            this.image = getImageForType(item.getItemType()); // Set the image based on the item type
+            this.sorted = false;
+            this.distributed = false;
+            this.sorterEmployee = sorterEmployee;
+            this.distributorEmployee = distributorEmployee;
+        }
+
+        private Image getImageForType(String itemType) {
+            switch (itemType) {
+                case "Metal":
+                    return metalImage;
+                case "Plastic":
+                    return plasticImage;
+                case "Glass":
+                    return glassImage;
+                case "Paper":
+                    return paperImage;
+                case "error":
+                    return errorImage;
+                default:
+                    return null;
+            }
+        }
+
+        public void draw(Graphics g, int middleY, int mainBeltEnd, int sorterX, int distributorX, int[] lanePositions) {
+            // Check if the object is at the sorter position and not already sorting
+            if (!item.isDone_sorting() && x >= sorterX - 10 && x <= sorterX + 10 && !isSorting) {
+                isSorting = true; // Set the sorting flag to true
+                new Thread(() -> {
+                    try {
+                        sorterEmployee.sort(item); // Sort the item
+                        Thread.sleep((long) ((item.get_time_to_sort() * 1000) / timeMultiplier)); // Sleep according to the sorting time
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    item.setisDone_sorting(true); // Mark the item as sorted
+                    sorterEmployee.incrementItemsDone(); // Increment the sorter's item count
+                    if (item.getsortingError()){
+                        this.image = getImageForType("error"); // Update the image based on sorted type
+                    }
+                    else{
+                        this.image = getImageForType(item.getItemType()); // Update the image based on sorted type
+                    }
+
+                    isSorting = false; // Reset the sorting flag
+                    sorterCount++; // Increment the sorter count
+                    SwingUtilities.invokeLater(() -> outputArea.append("Sorted: " + item.getItemType() + "\n")); // Print sorted message
+                }).start();
+            }
+
+            // If sorting, stop the object
+            if (!item.isDone_sorting() && isSorting) {
+                this.y = middleY; // Set the Y position based on the middle line
+                g.setColor(Color.WHITE); // Set the color to white
+                g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
+            } else {
+                // Move the object after sorting
+                if (!item.isDone_sorting()) {
+                    this.y = middleY; // Set the Y position based on the middle line
+                    g.setColor(Color.WHITE); // Set the color to white
+                    g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
+                } else {
+                    g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
+                    g.setColor(Color.BLACK); // Set the color to black
+                    g.drawString(item.getItemType(), x, y - 25); // Display the item type
+                }
+                x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
+            }
+
+            // Check if the object is at the distributor position and not already distributing
+            if (item.isDone_sorting() && !item.isdone_distribute() && x >= distributorX - 10 && x <= distributorX + 10 && !isDistributing) {
+                isDistributing = true; // Set the distributing flag to true
+                new Thread(() -> {
+                    try {
+                        distributorEmployee.distributeItem(item); // Distribute the item
+                        Thread.sleep((long) ((item.get_time_to_distribute() * 1000) / timeMultiplier)); // Sleep according to the distribution time
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    item.setisdone_distribute(true); // Mark the item as distributed
+                    distributorEmployee.incrementItemsDone(); // Increment the distributor's item count
+                    // Determine the lane based on item type and update position
+                    switch (item.getItemType()) {
+                        case "Metal":
+                            y = middleY - 120; // Set Y position for Metal lane
+                            x = mainBeltEnd + 10 + lanePositions[0]; // Set X position for Metal lane
+                            lanePositions[0] += 30; // Space out objects in the lane
+                            metalCount++; // Increment metal count
+                            break;
+                        case "Plastic":
+                            y = middleY - 80; // Set Y position for Plastic lane
+                            x = mainBeltEnd + 10 + lanePositions[1]; // Set X position for Plastic lane
+                            lanePositions[1] += 30; // Space out objects in the lane
+                            plasticCount++; // Increment plastic count
+                            break;
+                        case "Glass":
+                            y = middleY + 40; // Set Y position for Glass lane
+                            x = mainBeltEnd + 10 + lanePositions[2]; // Set X position for Glass lane
+                            lanePositions[2] += 30; // Space out objects in the lane
+                            glassCount++; // Increment glass count
+                            break;
+                        case "Paper":
+                            y = middleY + 80; // Set Y position for Paper lane
+                            x = mainBeltEnd + 10 + lanePositions[3]; // Set X position for Paper lane
+                            lanePositions[3] += 30; // Space out objects in the lane
+                            paperCount++; // Increment paper count
+                            break;
+                    }
+                    distributed = true; // Mark the object as distributed
+                    distributorCount++; // Increment the distributor count
+                    isDistributing = false; // Reset the distributing flag
+                    SwingUtilities.invokeLater(() -> outputArea.append("Distributed: " + item.getItemType() + "\n")); // Print distributed message
+                }).start();
+            }
+
+            // If distributing, stop the object
+            if (!item.isdone_distribute() && isDistributing) {
+                this.y = middleY; // Set the Y position based on the middle line
+                this.x = mainBeltEnd;
+            } else if (item.isdone_distribute()) {
+                x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
+                if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
+                    x = mainBeltEnd + 150; // Stop at the basket
+                    // Make the object disappear after 10 seconds
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(10000); // Wait for 10 seconds
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        movingObjects.remove(this); // Remove the object from the list
+                        SwingUtilities.invokeLater(railPanel::repaint); // Repaint the rail panel
+                    }).start();
+                }
+            }
+        }
+    }
+
+    private class RailPanel extends JPanel {
+        private List<MovingObject> movingObjects;
+        private int[] lanePositions;
+
+        RailPanel() {
+            this.movingObjects = new ArrayList<>();
+            this.lanePositions = new int[4]; // To keep track of positions in each lane
+        }
+
+        void setMovingObjects(List<MovingObject> movingObjects) {
+            this.movingObjects = movingObjects;
+            // Reset lane positions
+            for (int i = 0; i < lanePositions.length; i++) {
+                lanePositions[i] = 0;
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            setBackground(Color.decode("#5e5e5e")); // Set the background color
+
+            // Draw the background image
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+
+            int middleY = getHeight() / 2;
+            int mainBeltEnd = getWidth() - 300; // Shorten the main conveyor belt
+            int sorterX = mainBeltEnd / 2; // Position of the sorter in the middle of the main belt
+            int distributorX = mainBeltEnd + 10; // Position of the distributor at the end of the main belt
+
+            // Draw the main conveyor belt
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(0, middleY - 10, mainBeltEnd, 20); // Make the main belt thicker
+            g.setColor(Color.LIGHT_GRAY);
+            for (int i = 0; i < mainBeltEnd; i += 20) {
+                g.fillRect(i, middleY - 10, 10, 20); // Make the main belt thicker
+            }
+
+            // Draw the sorter employee
+            g.drawImage(sorterImage, sorterX - 30, middleY - 60, 60, 120, this); // Adjusted sorter image size
+            g.setColor(Color.BLACK);
+            g.drawString("Sorter Employee", sorterX - 30, middleY - 70); // Sorter label
+            g.drawString("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
+
+            // Draw the distributor employee in front of the main path
+            g.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120, this);
+            g.setColor(Color.BLACK);
+            g.drawString("Distributor", distributorX - 30, middleY - 60); // Distributor label
+            g.drawString("Distributed: " + distributorCount, distributorX - 30, middleY - 80); // Distributor counter
+
+            // Draw the connecting paths to the additional lanes
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(mainBeltEnd, middleY - 10, 20, 20); // Make the connecting path thicker
+
+            // Draw the lanes as steps forward
+            g.fillRect(mainBeltEnd + 10, middleY - 120, 150, 20); // Metal lane
+            g.fillRect(mainBeltEnd + 10, middleY - 80, 150, 20); // Plastic lane
+            g.fillRect(mainBeltEnd + 10, middleY + 40, 150, 20); // Glass lane
+            g.fillRect(mainBeltEnd + 10, middleY + 80, 150, 20); // Paper lane
+
+            g.setColor(Color.LIGHT_GRAY);
+            for (int i = mainBeltEnd + 10; i < mainBeltEnd + 160; i += 20) {
+                g.fillRect(i, middleY - 120, 10, 20); // Metal lane
+                g.fillRect(i, middleY - 80, 10, 20); // Plastic lane
+                g.fillRect(i, middleY + 40, 10, 20); // Glass lane
+                g.fillRect(i, middleY + 80, 10, 20); // Paper lane
+            }
+
+            // Add vertical connectors to make a smooth connection between the main belt and the lanes
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(mainBeltEnd, middleY - 130 + 10, 10, 100); // Metal vertical connector
+            g.fillRect(mainBeltEnd, middleY - 80 + 10, 10, 150);  // Plastic vertical connector
+            g.fillRect(mainBeltEnd, middleY + 10, 10, 10);       // Glass vertical connector
+            g.fillRect(mainBeltEnd, middleY + 20 + 10, 10, 70);  // Paper vertical connector
+
+            // Draw baskets at the end of each lane
+            g.setColor(Color.ORANGE);
+            g.fillRect(mainBeltEnd + 160, middleY - 120, 30, 20); // Metal basket
+            g.fillRect(mainBeltEnd + 160, middleY - 80, 30, 20); // Plastic basket
+            g.fillRect(mainBeltEnd + 160, middleY + 40, 30, 20); // Glass basket
+            g.fillRect(mainBeltEnd + 160, middleY + 80, 30, 20); // Paper basket
+
+            // Draw the counters for each material type
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+            g.drawString("Metal: " + metalCount, mainBeltEnd + 200, middleY - 110);
+            g.drawString("Plastic: " + plasticCount, mainBeltEnd + 200, middleY - 70);
+            g.drawString("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
+            g.drawString("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
+
+            // Draw the big squares for hours of working and plastic sorted
+            g.setColor(Color.WHITE);
+            g.fillRect(sorterX - 150, middleY - 200, 200, 100); // Square for hours of working
+            g.fillRect(sorterX + 50, middleY - 200, 200, 100); // Square for plastic sorted
+
+            g.setColor(Color.BLACK);
+            g.drawRect(sorterX - 150, middleY - 200, 200, 100); // Border for hours of working
+            g.drawRect(sorterX + 50, middleY - 200, 200, 100); // Border for plastic sorted
+
+            g.drawString("Hours of Working", sorterX - 140, middleY - 180);
+            g.drawString("Plastic Sorted: " + plasticCount, sorterX + 60, middleY - 180);
+
+            // Calculate and display hours of working based on total items sorted and distributed
+            int totalItemsProcessed = sorterCount + distributorCount;
+            int hoursOfWorking = totalItemsProcessed / 25;
+            g.drawString("Hours: " + hoursOfWorking, sorterX - 140, middleY - 160);
+
+            // Draw the moving objects
+            for (MovingObject obj : movingObjects) {
+                obj.draw(g, middleY, mainBeltEnd, sorterX, distributorX, lanePositions);
+            }
         }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(GUIMain::new);
     }
-
-    // Inner class for custom drawing
-    class ItemPanel extends JPanel {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            // Draw the main lane
-            g.setColor(Color.LIGHT_GRAY);
-            g.fillRect(0, 100, 600, 40); // Main lane
-
-            // Draw lanes with visible paths
-            for (int i = 0; i < itemTypes.length; i++) {
-                // Draw lane background
-                g.setColor(Color.LIGHT_GRAY);
-                g.fillRect(i * laneWidth, 140, laneWidth, laneHeight); // Draw each lane
-
-                // Draw lane border
-                g.setColor(Color.BLACK);
-                g.drawRect(i * laneWidth, 140, laneWidth, laneHeight); // Draw border around each lane
-
-                // Draw lane labels and counts
-                g.setColor(Color.BLACK);
-                g.drawString(itemTypes[i], i * laneWidth + 10, 135); // Label each lane
-                g.drawString("Count: " + sortedCounts[i], i * laneWidth + 10, 270); // Display sorted count
-            }
-
-            // Draw all moving items
-            for (MovingItem item : movingItems) {
-                item.draw(g); // Draw each item
-            }
-        }
-    }
-
-    // Class to represent each moving item
-    class MovingItem {
-        private int materialIndex;
-        private Color color;
-        private double weight;
-        private int itemX; // X position of the item
-        private int itemY; // Y position of the item
-        private Timer movementTimer;
-
-        public MovingItem(int materialIndex, Color color, double weight) {
-            this.materialIndex = materialIndex;
-            this.color = color;
-            this.weight = weight;
-            this.itemX = 0; // Start at the beginning of the main lane
-            this.itemY = 0; // Initialize itemY as 0, will be set during lane branching
-        }
-
-        public void startMovement(ItemPanel panel, Consumer<MovingItem> sortingCompleteListener) {
-            movementTimer = new Timer(50, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (itemX < 600) { // Allow full lane length
-                        itemX += 2; // Move 2 pixels to the right
-                        panel.repaint(); // Repaint the panel
-                    } else {
-                        movementTimer.stop(); // Stop the main lane movement
-                        branchToLane(panel, sortingCompleteListener); // Branch to the correct lane
-                    }
-                }
-            });
-            movementTimer.start(); // Start the timer for item movement
-        }
-
-        private void branchToLane(ItemPanel panel, Consumer<MovingItem> sortingCompleteListener) {
-            itemY = 140 + (materialIndex * laneHeight); // Set Y position to the corresponding lane
-            Timer laneTimer = new Timer(50, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (itemX < laneWidth) { // Move item into the lane
-                        itemX += 2; // Move 2 pixels to the right
-                        panel.repaint(); // Repaint the panel
-                    } else {
-                        ((Timer) e.getSource()).stop(); // Stop the lane movement timer
-                        sortingCompleteListener.accept(MovingItem.this); // Notify sorting completion
-                    }
-                }
-            });
-            laneTimer.start(); // Start the timer for lane movement
-        }
-
-        public void draw(Graphics g) {
-            g.setColor(color); // Set the item's color
-            g.fillRect(itemX, itemY + 100, 20, 20); // Draw the item as a rectangle along the main path
-        }
-
-        public int getMaterialIndex() {
-            return materialIndex; // Return the index for sorting
-        }
-
-        public String getItemType() {
-            return itemTypes[materialIndex]; // Return the item type as a string
-        }
-
-        public Recyclableitem getRecyclableItem() {
-            // Create and return the appropriate Recyclableitem based on the material index
-            double weight = this.weight; // Use the weight assigned to this item
-            switch (materialIndex) {
-                case 0: return new Plastic(weight);
-                case 1: return new Metal(weight);
-                case 2: return new Glass(weight);
-                case 3: return new Paper(weight);
-                default: return null; // Should not happen
-            }
-        }
-    }
 }
-
-// Assume Recyclableitem, Plastic, Metal, Glass, and Paper classes exist with the appropriate methods.

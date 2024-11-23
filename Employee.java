@@ -6,9 +6,9 @@ public class Employee {
     private Double workingHours;
     private String name;
     private Integer experienceYears;
-    Double tiredness;
-    Integer itemsDone;
-    Integer errorsNum;
+    private Double tiredness;
+    private Integer itemsDone;
+    private Integer errorsNum;
   
 
     public Employee(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {
@@ -52,7 +52,6 @@ public class Employee {
             sortTime = Math.max(sortTime, 1.0); // Ensure minimum time is 1 second
             sortTime += 0.1 + (random.nextDouble() * 0.8); // Add random number between 0.1 and 0.9
              }
-        sortTime = Math.round(sortTime * 10.0) / 10.0; // Format to one decimal place
         recyclable.set_time_to_sort(sortTime);
         return sortTime;
     }
@@ -66,12 +65,15 @@ public class Employee {
 
         double errorChance = Math.min(0.3, (tiredness * 0.05) - (experienceYears * 0.01)); // Error depends on tiredness and experience
         boolean hasError = random.nextDouble() < errorChance;
+        sortTime = Math.round(sortTime * 10.0) / 10.0;
+        //recyclable.setisDone_sorting(true);
+        //recyclable.setItemType_sorter(recyclable.getItemType());
 
-        recyclable.setisDone_sorting(true);
-
-        incrementItemsDone();
+        //incrementItemsDone();
         if (hasError) {
             recyclable.setsortingError(true);
+            //recyclable.setItemType_sorter(Recyclableitem.createRandomItem());
+
         }
 
         return !hasError;
@@ -93,7 +95,7 @@ public class Employee {
 
     public void distributeItem(Recyclableitem item) {
         double distributeTime = calculateDistributeTime(item);
-        //System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
+        System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
 
         workingHours += distributeTime;
         tiredness += distributeTime * 0.3; // Increment tiredness
@@ -101,16 +103,16 @@ public class Employee {
 
         switch (item.getItemType()) {
             case "Plastic":
-                System.out.println(getName() + " distributing to the Plastic path."+" it will take: "+ distributeTime + " seconds.");                
+                System.out.println(getName() + " distributed the Plastic path.");                
                 break;
             case "Metal":
-                System.out.println(getName() + " distributing to the Metal path."+" it will take: "+ distributeTime + " seconds.");                
+                System.out.println(getName() + " distributed the Metal path.");                
                 break;
             case "Glass":
-                System.out.println(getName() + " distributing to the Glass path."+" it will take: "+ distributeTime + " seconds.");                
+                System.out.println(getName() + " distributed the Glass path.");                
                 break;
             case "Paper":
-                System.out.println(getName() + " distributing to the Paper path."+" it will take: "+ distributeTime + " seconds.");                
+                System.out.println(getName() + " distributed the Paper path.");                
                 break;
             default:
                 System.out.println(getName() + " encountered an unknown item type: " + item.getItemType());
