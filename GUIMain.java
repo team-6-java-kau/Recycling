@@ -110,7 +110,7 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(30000);
+        List<Recyclableitem> items = Recyclableitem.createList(3);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
         Employee distributor = new Employee(2, 5.0, "Sara", 3); 
@@ -276,6 +276,16 @@ public class GUIMain {
                 x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
                 if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
                     x = mainBeltEnd + 150; // Stop at the basket
+                    // Make the object disappear after 10 seconds
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(10000); // Wait for 10 seconds
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        movingObjects.remove(this); // Remove the object from the list
+                        SwingUtilities.invokeLater(railPanel::repaint); // Repaint the rail panel
+                    }).start();
                 }
             }
         }
