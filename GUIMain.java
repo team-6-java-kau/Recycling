@@ -318,6 +318,9 @@ public class GUIMain {
                         int minutes = (int) (elapsedTime / 60000) % 60;
                         int seconds = (int) (elapsedTime / 1000) % 60;
                         distributingLogArea.append("Item distributed\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
+                        if (movingObjects.stream().allMatch(obj -> obj.item.isdone_distribute())) {
+                            clockTimer.stop(); // Stop the timer when the last item is distributed
+                        }
                     }); // Print distributed message
                 }).start();
             }
