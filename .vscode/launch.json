@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "GUIMain",
+            "request": "launch",
+            "mainClass": "GUIMain",
+            "projectName": "Recycling_548a14b"
+        },
+        {
+            "type": "java",
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",

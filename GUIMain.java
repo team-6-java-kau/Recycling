@@ -338,7 +338,12 @@ public class GUIMain {
                             e.printStackTrace();
                         }
                         movingObjects.remove(this); // Remove the object from the list
-                        SwingUtilities.invokeLater(railPanel::repaint); // Repaint the rail panel
+                        SwingUtilities.invokeLater(() -> {
+                            railPanel.repaint(); // Repaint the rail panel
+                            if (movingObjects.isEmpty()) {
+                                clockTimer.stop(); // Stop the timer when the last item is distributed
+                            }
+                        });
                     }).start();
                 }
             }
