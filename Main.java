@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+/*import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -25,4 +25,4 @@ public class Main {
 
         System.out.println("Errors encountered: " + muhammed.errorsNum);
     }
-}
+}*/

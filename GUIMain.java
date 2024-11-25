@@ -142,7 +142,7 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(3);
+        List<Recyclableitem> items = Recyclableitem.createList(30);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
         Employee distributor = new Employee(2, 5.0, "Sara", 3); 
