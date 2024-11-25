@@ -32,6 +32,8 @@ public class GUIMain {
     private JLabel timeLabel;
     private long startTime;
     private long elapsedTimeBefore = 0;
+    private JTextArea sortingLogArea;
+    private JTextArea distributingLogArea;
 
     public GUIMain() {
         frame = new JFrame("Simulation");
@@ -67,10 +69,27 @@ public class GUIMain {
 
         startButton.addActionListener(e -> {
             System.out.println("Start button clicked");
-            if (experienceField.getText().trim().isEmpty()) {
+            String experienceText = experienceField.getText().trim();
+            if (experienceText.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, 
                     "Please enter Experience value",
                     "Input Required",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            try {
+                int experienceInput = Integer.parseInt(experienceText);
+                if (experienceInput < 0 || experienceInput > 25) {
+                    JOptionPane.showMessageDialog(frame, 
+                        "Experience must be between 0 and 25 years",
+                        "Invalid Input",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Please enter a valid number for Experience",
+                    "Invalid Input",
                     JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -80,11 +99,22 @@ public class GUIMain {
         railPanel = new RailPanel();
         frame.add(railPanel, BorderLayout.CENTER);
 
-        outputArea = new JTextArea();
-        outputArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(outputArea);
-        scrollPane.setPreferredSize(new Dimension(200, frame.getHeight()));
-        frame.add(scrollPane, BorderLayout.EAST);
+        sortingLogArea = new JTextArea();
+        sortingLogArea.setEditable(false);
+        JScrollPane sortingScrollPane = new JScrollPane(sortingLogArea);
+        sortingScrollPane.setPreferredSize(new Dimension(200, frame.getHeight() / 2));
+
+        distributingLogArea = new JTextArea();
+        distributingLogArea.setEditable(false);
+        JScrollPane distributingScrollPane = new JScrollPane(distributingLogArea);
+        distributingScrollPane.setPreferredSize(new Dimension(200, frame.getHeight() / 2));
+
+        JPanel logPanel = new JPanel();
+        logPanel.setLayout(new GridLayout(2, 1));
+        logPanel.add(sortingScrollPane);
+        logPanel.add(distributingScrollPane);
+
+        frame.add(logPanel, BorderLayout.EAST);
 
         frame.add(inputPanel, BorderLayout.NORTH);
         frame.setVisible(true);
@@ -112,7 +142,7 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(3);
+        List<Recyclableitem> items = Recyclableitem.createList(30);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
         Employee distributor = new Employee(2, 5.0, "Sara", 3); 
@@ -209,7 +239,14 @@ public class GUIMain {
 
                     isSorting = false; // Reset the sorting flag
                     sorterCount++; // Increment the sorter count
-                    SwingUtilities.invokeLater(() -> outputArea.append("Sorted: " + item.getItemType() + "\n")); // Print sorted message
+                    SwingUtilities.invokeLater(() -> {
+                        long currentTime = System.currentTimeMillis();
+                        long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                        int hours = (int) (elapsedTime / 3600000);
+                        int minutes = (int) (elapsedTime / 60000) % 60;
+                        int seconds = (int) (elapsedTime / 1000) % 60;
+                        sortingLogArea.append("Item sorted\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
+                    }); // Print sorted message
                 }).start();
             }
 
@@ -274,7 +311,14 @@ public class GUIMain {
                     distributed = true; // Mark the object as distributed
                     distributorCount++; // Increment the distributor count
                     isDistributing = false; // Reset the distributing flag
-                    SwingUtilities.invokeLater(() -> outputArea.append("Distributed: " + item.getItemType() + "\n")); // Print distributed message
+                    SwingUtilities.invokeLater(() -> {
+                        long currentTime = System.currentTimeMillis();
+                        long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                        int hours = (int) (elapsedTime / 3600000);
+                        int minutes = (int) (elapsedTime / 60000) % 60;
+                        int seconds = (int) (elapsedTime / 1000) % 60;
+                        distributingLogArea.append("Item distributed\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
+                    }); // Print distributed message
                 }).start();
             }
 
