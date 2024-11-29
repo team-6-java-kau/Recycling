@@ -39,6 +39,7 @@ public class GUIMain {
     private JButton speedUp2xButton;
     private JButton speedUp4xButton;
     private JButton speedUp1xButton;
+    private JButton stopButton;
     private boolean startButtonPressed = false;
 
     public GUIMain() {
@@ -115,18 +116,22 @@ public class GUIMain {
         timeLabel = new JLabel("Time: 00:00:00");
         inputPanel.add(timeLabel);
 
+        stopButton = new JButton("Pause");
+        speedUp1xButton = new JButton("x1");
         speedUp2xButton = new JButton("x2");
         speedUp4xButton = new JButton("x4");
-        speedUp1xButton = new JButton("x1");
-
+        
+        stopButton.setEnabled(false);
         speedUp2xButton.setEnabled(false);
         speedUp4xButton.setEnabled(false);
         speedUp1xButton.setEnabled(false);
-
+        
+        inputPanel.add(stopButton);
+        inputPanel.add(speedUp1xButton);
         inputPanel.add(speedUp2xButton);
         inputPanel.add(speedUp4xButton);
-        inputPanel.add(speedUp1xButton);
-
+        
+        stopButton.addActionListener(e -> setTimeMultiplier(0));
         speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
         speedUp4xButton.addActionListener(e -> setTimeMultiplier(4));
         speedUp1xButton.addActionListener(e -> setTimeMultiplier(1));
@@ -135,6 +140,7 @@ public class GUIMain {
         inputPanel.add(startButton);
 
         startButton.addActionListener(e -> {
+            startButton.setEnabled(false);
             if (startButtonPressed) {
                 return;
             }
@@ -147,6 +153,8 @@ public class GUIMain {
                     "Input Required",
                     JOptionPane.WARNING_MESSAGE);
                 startButtonPressed = false;
+                startButton.setEnabled(true);
+
                 return;
             }
             try {
@@ -167,6 +175,7 @@ public class GUIMain {
                 startButtonPressed = false;
                 return;
             }
+            stopButton.setEnabled(true);
             speedUp2xButton.setEnabled(true);
             speedUp4xButton.setEnabled(true);
             speedUp1xButton.setEnabled(true);
@@ -236,7 +245,7 @@ public class GUIMain {
         List<Recyclableitem> items = Recyclableitem.createList(numObjects);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
-        Employee distributor = new Employee(2, 5.0, "spotty", 3);
+        Employee distributor = new Employee(2, 5.0, "spotty", experienceInput);
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
 
