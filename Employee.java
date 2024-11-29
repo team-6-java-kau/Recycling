@@ -95,7 +95,7 @@ public class Employee {
 
     public void distributeItem(Recyclableitem item) {
         double distributeTime = calculateDistributeTime(item);
-        System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
+        //System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
 
         workingHours += distributeTime;
         tiredness += distributeTime * 0.3; // Increment tiredness
