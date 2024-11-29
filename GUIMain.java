@@ -230,12 +230,8 @@ public class GUIMain {
                     }
                     item.setisDone_sorting(true); // Mark the item as sorted
                     sorterEmployee.incrementItemsDone(); // Increment the sorter's item count
-                    if (item.getsortingError()){
-                        this.image = getImageForType("error"); // Update the image based on sorted type
-                    }
-                    else{
-                        this.image = getImageForType(item.getItemType()); // Update the image based on sorted type
-                    }
+                    this.image = getImageForType(item.getItemType()); // Update the image based on sorted type
+
 
                     isSorting = false; // Reset the sorting flag
                     sorterCount++; // Increment the sorter count
@@ -263,7 +259,13 @@ public class GUIMain {
                     g.fillOval(x, y - 15, 30, 30); // Draw the object as a white circle
                 } else {
                     g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
-                    g.setColor(Color.BLACK); // Set the color to black
+                    
+                    if (item.getsortingError()){
+                        g.setColor(Color.RED); // Set the color to black
+                    }
+                    else{
+                        g.setColor(Color.green); // Set the color to black
+                    }
                     g.drawString(item.getItemType(), x, y - 25); // Display the item type
                 }
                 x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
