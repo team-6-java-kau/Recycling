@@ -373,6 +373,7 @@ public class GUIMain {
                         boolean hasError = sorterEmployee.sort(item); // Sort the item
                         if (item.getsortingError()) {
                             totalErrors++; // Increment total errors if there is a sorting error
+                            
                         }
                         long sortTimeMillis = (long) (item.get_time_to_sort() * 1000);
                         Thread.sleep(sortTimeMillis / timeMultiplier); // Sleep according to the sorting time
@@ -482,8 +483,8 @@ public class GUIMain {
                         distributingLogArea.append("Item distributed\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
                         if (allItemsDistributed()) {
                             pahse1_done = true;
-                            JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
                             clockTimer.stop(); // Stop the timer when all objects are distributed
+                            JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
                             returnButton.setEnabled(true); // Enable the return button
 
                         }
@@ -572,8 +573,8 @@ public class GUIMain {
             // Draw the distributor employee in front of the main path
             g.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120, this);
             g.setColor(Color.BLACK);
-            g.drawString("Distributor", distributorX - 30, middleY - 60); // Distributor label
-            g.drawString("Distributed: " + distributorCount, distributorX - 30, middleY - 80); // Distributor counter
+            g.drawString("Distributor Employee", distributorX + 50, middleY - 0); // Distributor label
+            g.drawString("Distributed: " + distributorCount, distributorX + 50, middleY - 30); // Distributor counter
 
             // Draw the connecting paths to the additional lanes
             g.setColor(Color.DARK_GRAY);
@@ -606,6 +607,13 @@ public class GUIMain {
             g.fillRect(mainBeltEnd + 160, middleY - 80, 30, 20); // Plastic basket
             g.fillRect(mainBeltEnd + 160, middleY + 40, 30, 20); // Glass basket
             g.fillRect(mainBeltEnd + 160, middleY + 80, 30, 20); // Paper basket
+
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+            g.drawString("Metal: " + metalCount, mainBeltEnd + 200, middleY - 110);
+            g.drawString("Plastic: " + plasticCount, mainBeltEnd + 200, middleY - 70);
+            g.drawString("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
+            g.drawString("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
 
             // Draw the additional information box
             g.setColor(Color.WHITE);
