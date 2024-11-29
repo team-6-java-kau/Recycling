@@ -46,6 +46,11 @@ public class GUIMain {
     private Image mainBackgroundImage;
     private boolean pahse1_done = false;
     private JButton returnButton;
+    private double totalPlasticWeight = 0;
+    private double totalMetalWeight = 0;
+    private double totalGlassWeight = 0;
+    private double totalPaperWeight = 0;
+    private int totalErrors = 0;
 
 
     public GUIMain() {
@@ -103,7 +108,7 @@ public class GUIMain {
                     JOptionPane.showMessageDialog(frame, 
                         "Number of objects must be greater than 0",
                         "Invalid Input",
-                        JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -359,12 +364,16 @@ public class GUIMain {
         }
 
         public void draw(Graphics g, int middleY, int mainBeltEnd, int sorterX, int distributorX, int[] lanePositions) {
+
             // Check if the object is at the sorter position and not already sorting
             if (!item.isDone_sorting() && x >= sorterX - 10 && x <= sorterX + 10 && !isSorting) {
                 isSorting = true; // Set the sorting flag to true
                 new Thread(() -> {
                     try {
-                        sorterEmployee.sort(item); // Sort the item
+                        boolean hasError = sorterEmployee.sort(item); // Sort the item
+                        if (item.getsortingError()) {
+                            totalErrors++; // Increment total errors if there is a sorting error
+                        }
                         long sortTimeMillis = (long) (item.get_time_to_sort() * 1000);
                         Thread.sleep(sortTimeMillis / timeMultiplier); // Sleep according to the sorting time
                         totalSortingTime += sortTimeMillis; // Update total sorting time
@@ -405,10 +414,10 @@ public class GUIMain {
                     g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
                     
                     if (item.getsortingError()){
-                        g.setColor(Color.RED); // Set the color to black
+                        g.setColor(Color.RED); // Set the color to red for errors
                     }
                     else{
-                        g.setColor(Color.green); // Set the color to black
+                        g.setColor(Color.GREEN); // Set the color to green for correct sorting
                     }
                     g.drawString(item.getItemType(), x, y - 25); // Display the item type
                 }
@@ -437,24 +446,28 @@ public class GUIMain {
                             x = mainBeltEnd + 10 + lanePositions[0]; // Set X position for Metal lane
                             lanePositions[0] += 30; // Space out objects in the lane
                             metalCount++; // Increment metal count
+                            totalMetalWeight += item.getItemWeight(); // Update total metal weight
                             break;
                         case "Plastic":
                             y = middleY - 80; // Set Y position for Plastic lane
                             x = mainBeltEnd + 10 + lanePositions[1]; // Set X position for Plastic lane
                             lanePositions[1] += 30; // Space out objects in the lane
                             plasticCount++; // Increment plastic count
+                            totalPlasticWeight += item.getItemWeight(); // Update total plastic weight
                             break;
                         case "Glass":
                             y = middleY + 40; // Set Y position for Glass lane
                             x = mainBeltEnd + 10 + lanePositions[2]; // Set X position for Glass lane
                             lanePositions[2] += 30; // Space out objects in the lane
                             glassCount++; // Increment glass count
+                            totalGlassWeight += item.getItemWeight(); // Update total glass weight
                             break;
                         case "Paper":
                             y = middleY + 80; // Set Y position for Paper lane
                             x = mainBeltEnd + 10 + lanePositions[3]; // Set X position for Paper lane
                             lanePositions[3] += 30; // Space out objects in the lane
                             paperCount++; // Increment paper count
+                            totalPaperWeight += item.getItemWeight(); // Update total paper weight
                             break;
                     }
                     distributed = true; // Mark the object as distributed
@@ -594,46 +607,36 @@ public class GUIMain {
             g.fillRect(mainBeltEnd + 160, middleY + 40, 30, 20); // Glass basket
             g.fillRect(mainBeltEnd + 160, middleY + 80, 30, 20); // Paper basket
 
-            // Draw the counters for each material type
-            g.setColor(Color.BLACK);
-            g.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-            g.drawString("Metal: " + metalCount, mainBeltEnd + 200, middleY - 110);
-            g.drawString("Plastic: " + plasticCount, mainBeltEnd + 200, middleY - 70);
-            g.drawString("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
-            g.drawString("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
-
-            // Draw the big squares for hours of working, total sorting time, and average sorting time
+            // Draw the additional information box
             g.setColor(Color.WHITE);
-            g.fillRect(sorterX - 150, middleY - 250, 200, 100); // Square for hours of working
-            g.fillRect(sorterX + 50, middleY - 250, 200, 100); // Square for total sorting time
-            g.fillRect(sorterX + 50, middleY - 150, 200, 100); // Square for average sorting time
+            g.fillRect(sorterX - 150, middleY - 350, 400, 230); // Square for additional information
 
             g.setColor(Color.BLACK);
-            g.drawRect(sorterX - 150, middleY - 250, 200, 100); // Border for hours of working
-            g.drawRect(sorterX + 50, middleY - 250, 200, 100); // Border for total sorting time
-            g.drawRect(sorterX + 50, middleY - 150, 200, 100); // Border for average sorting time
+            g.drawRect(sorterX - 150, middleY - 350, 400, 230); // Border for additional information
 
-            g.drawString("Hours of Working", sorterX - 140, middleY - 230);
-            g.drawString("Total Sorting Time", sorterX + 60, middleY - 230);
-            g.drawString("Average Sorting Time", sorterX + 60, middleY - 130);
+            g.drawString("Number of Objects Done: " + totalSortedItems, sorterX - 140, middleY - 330);
+            g.drawString("Number of Errors: " + totalErrors, sorterX - 140, middleY - 310);
+            g.drawString("Tons Done for Each Material:", sorterX - 140, middleY - 290);
+            g.drawString("Plastic: " + totalPlasticWeight / 1000 + " tons", sorterX - 140, middleY - 270);
+            g.drawString("Metal: " + totalMetalWeight / 1000 + " tons", sorterX - 140, middleY - 250);
+            g.drawString("Glass: " + totalGlassWeight / 1000 + " tons", sorterX - 140, middleY - 230);
+            g.drawString("Paper: " + totalPaperWeight / 1000 + " tons", sorterX - 140, middleY - 210);
 
             // Calculate and display hours of working based on total items sorted and distributed
-            int totalItemsProcessed = sorterCount + distributorCount;
-            int hoursOfWorking = totalItemsProcessed / 25;
-            g.drawString("Hours: " + hoursOfWorking, sorterX - 140, middleY - 210);
+          
 
             // Calculate and display total sorting time
             long totalSortingSeconds = totalSortingTime / 1000;
             int sortingHours = (int) (totalSortingSeconds / 3600);
             int sortingMinutes = (int) (totalSortingSeconds / 60) % 60;
             int sortingSeconds = (int) (totalSortingSeconds % 60);
-            g.drawString(String.format("Time: %02d:%02d:%02d", sortingHours, sortingMinutes, sortingSeconds), sorterX + 60, middleY - 210);
+            g.drawString(String.format("Total Sorting Time: %02d:%02d:%02d", sortingHours, sortingMinutes, sortingSeconds), sorterX - 140, middleY - 190);
 
             // Calculate and display average sorting time
             double averageSortingTime = totalSortedItems > 0 ? (double) totalSortingTime / totalSortedItems / 1000 : 0;
             int avgSortingMinutes = (int) (averageSortingTime / 60);
             int avgSortingSeconds = (int) (averageSortingTime % 60);
-            g.drawString(String.format("Time: %02d:%02d", avgSortingMinutes, avgSortingSeconds), sorterX + 60, middleY - 110);
+            g.drawString(String.format("Average Sorting Time: %02d:%02d", avgSortingMinutes, avgSortingSeconds), sorterX - 140, middleY - 170);
 
             // Draw the moving objects
             for (MovingObject obj : movingObjects) {
