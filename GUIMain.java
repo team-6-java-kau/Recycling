@@ -55,14 +55,17 @@ public class GUIMain {
         JButton speedUp2xButton = new JButton("x2");
         JButton speedUp4xButton = new JButton("x4");
         JButton normalSpeedButton = new JButton("Normal");
+        JButton stopButton = new JButton("Stop");
 
         inputPanel.add(speedUp2xButton);
         inputPanel.add(speedUp4xButton);
         inputPanel.add(normalSpeedButton);
+        inputPanel.add(stopButton);
 
         speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
         speedUp4xButton.addActionListener(e -> setTimeMultiplier(4));
         normalSpeedButton.addActionListener(e -> setTimeMultiplier(1));
+        stopButton.addActionListener(e -> setTimeMultiplier(0));
 
         JButton startButton = new JButton("Start");
         inputPanel.add(startButton);
