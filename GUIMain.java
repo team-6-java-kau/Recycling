@@ -482,11 +482,17 @@ public class GUIMain {
                         int seconds = (int) (elapsedTime / 1000) % 60;
                         distributingLogArea.append("Item distributed\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
                         if (allItemsDistributed()) {
-                            pahse1_done = true;
-                            clockTimer.stop(); // Stop the timer when all objects are distributed
-                            JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
-                            returnButton.setEnabled(true); // Enable the return button
+                            try {
+                                Thread.sleep(0); // Sleep for 0.1 seconds
+                                pahse1_done = true;
+                                clockTimer.stop(); // Stop the timer when all objects are distributed
+                                JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
+                                stopButton.setEnabled(false); // Disable the stop button
+                                returnButton.setEnabled(true); // Enable the return button
 
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }); // Print distributed message
                 }).start();
