@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 public class GUIMain {
     private JFrame frame;
     private JTextField experienceField;
+    private JTextField numObjectsField;
+    private int numObjects;
     private JTextArea outputArea;
     private RailPanel railPanel;
     private List<MovingObject> movingObjects;
@@ -34,8 +36,69 @@ public class GUIMain {
     private long elapsedTimeBefore = 0;
     private JTextArea sortingLogArea;
     private JTextArea distributingLogArea;
+    private JButton speedUp2xButton;
+    private JButton speedUp4xButton;
+    private JButton speedUp1xButton;
+    private boolean startButtonPressed = false;
 
     public GUIMain() {
+        frame = new JFrame("Main Page");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
+        frame.setResizable(false);
+        frame.getContentPane().setBackground(Color.decode("#5e5e5e"));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new GridLayout(3, 1));
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(new JLabel("Number of Objects:"));
+        numObjectsField = new JTextField(10);
+        inputPanel.add(numObjectsField);
+
+        JButton phase1Button = new JButton("Phase 1");
+        JButton phase2Button = new JButton("Phase 2");
+
+        phase1Button.addActionListener(e -> {
+            String numObjectsText = numObjectsField.getText().trim();
+            if (numObjectsText.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Please enter the number of objects",
+                    "Input Required",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            try {
+                numObjects = Integer.parseInt(numObjectsText);
+                if (numObjects <= 0) {
+                    JOptionPane.showMessageDialog(frame, 
+                        "Number of objects must be greater than 0",
+                        "Invalid Input",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, 
+                    "Please enter a valid number for the number of objects",
+                    "Invalid Input",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            startPhase1();
+        });
+
+        phase2Button.addActionListener(e -> startPhase2());
+
+        mainPanel.add(inputPanel);
+        mainPanel.add(phase1Button);
+        mainPanel.add(phase2Button);
+
+        frame.add(mainPanel);
+        frame.setVisible(true);
+    }
+
+    private void startPhase1() {
+        frame.dispose();
         frame = new JFrame("Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1300, 900); // Set to HD resolution
@@ -52,22 +115,30 @@ public class GUIMain {
         timeLabel = new JLabel("Time: 00:00:00");
         inputPanel.add(timeLabel);
 
-        JButton speedUp2xButton = new JButton("x2");
-        JButton speedUp4xButton = new JButton("x4");
-        JButton normalSpeedButton = new JButton("Normal");
+        speedUp2xButton = new JButton("x2");
+        speedUp4xButton = new JButton("x4");
+        speedUp1xButton = new JButton("x1");
+
+        speedUp2xButton.setEnabled(false);
+        speedUp4xButton.setEnabled(false);
+        speedUp1xButton.setEnabled(false);
 
         inputPanel.add(speedUp2xButton);
         inputPanel.add(speedUp4xButton);
-        inputPanel.add(normalSpeedButton);
+        inputPanel.add(speedUp1xButton);
 
         speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
         speedUp4xButton.addActionListener(e -> setTimeMultiplier(4));
-        normalSpeedButton.addActionListener(e -> setTimeMultiplier(1));
+        speedUp1xButton.addActionListener(e -> setTimeMultiplier(1));
 
         JButton startButton = new JButton("Start");
         inputPanel.add(startButton);
 
         startButton.addActionListener(e -> {
+            if (startButtonPressed) {
+                return;
+            }
+            startButtonPressed = true;
             System.out.println("Start button clicked");
             String experienceText = experienceField.getText().trim();
             if (experienceText.isEmpty()) {
@@ -75,6 +146,7 @@ public class GUIMain {
                     "Please enter Experience value",
                     "Input Required",
                     JOptionPane.WARNING_MESSAGE);
+                startButtonPressed = false;
                 return;
             }
             try {
@@ -84,6 +156,7 @@ public class GUIMain {
                         "Experience must be between 0 and 25 years",
                         "Invalid Input",
                         JOptionPane.WARNING_MESSAGE);
+                    startButtonPressed = false;
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -91,8 +164,12 @@ public class GUIMain {
                     "Please enter a valid number for Experience",
                     "Invalid Input",
                     JOptionPane.WARNING_MESSAGE);
+                startButtonPressed = false;
                 return;
             }
+            speedUp2xButton.setEnabled(true);
+            speedUp4xButton.setEnabled(true);
+            speedUp1xButton.setEnabled(true);
             startSimulation();
         });
 
@@ -134,6 +211,20 @@ public class GUIMain {
         errorImage = new ImageIcon("error.png").getImage();
     }
 
+    private void startPhase2() {
+        frame.dispose();
+        frame = new JFrame("Phase 2");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1300, 900);
+        frame.setResizable(false);
+        frame.getContentPane().setBackground(Color.decode("#5e5e5e"));
+
+        JLabel label = new JLabel("Phase 2 Page", SwingConstants.CENTER);
+        frame.add(label, BorderLayout.CENTER);
+
+        frame.setVisible(true);
+    }
+
     private void setTimeMultiplier(int multiplier) {
         long currentTime = System.currentTimeMillis();
         elapsedTimeBefore += (currentTime - startTime) * timeMultiplier;
@@ -142,17 +233,19 @@ public class GUIMain {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(30);
+        List<Recyclableitem> items = Recyclableitem.createList(numObjects);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
-        Employee distributor = new Employee(2, 5.0, "spotty", 3); 
+        Employee distributor = new Employee(2, 5.0, "spotty", 3);
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
 
         new Thread(() -> {
+            int startX = -50;
             for (Recyclableitem item : items) {
-                movingObjects.add(new MovingObject(item, -50, sorter, distributor)); // Pass employees
+                movingObjects.add(new MovingObject(item, startX, sorter, distributor)); // Pass employees
                 railPanel.repaint();
+                startX -= 35; // Ensure at least 5 pixels difference (30px object width + 5px gap)
                 try {
                     Thread.sleep(1000); // Wait for 1 second before adding the next item
                 } catch (InterruptedException e) {

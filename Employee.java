@@ -101,7 +101,7 @@ public class Employee {
         tiredness += distributeTime * 0.3; // Increment tiredness
         incrementItemsDone();
 
-        switch (item.getItemType()) {
+       /* switch (item.getItemType()) {
             case "Plastic":
                 System.out.println(getName() + " distributed the Plastic path.");                
                 break;
@@ -117,7 +117,7 @@ public class Employee {
             default:
                 System.out.println(getName() + " encountered an unknown item type: " + item.getItemType());
                 break;
-        }
+        }*/ 
      }
     }
   
