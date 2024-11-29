@@ -117,7 +117,7 @@ public class GUIMain {
         inputPanel.add(timeLabel);
 
         stopButton = new JButton("Pause");
-        speedUp1xButton = new JButton("x1");
+        speedUp1xButton = new JButton("Play");
         speedUp2xButton = new JButton("x2");
         speedUp4xButton = new JButton("x4");
         
@@ -165,6 +165,8 @@ public class GUIMain {
                         "Invalid Input",
                         JOptionPane.WARNING_MESSAGE);
                     startButtonPressed = false;
+                    startButton.setEnabled(true);
+
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -379,10 +381,13 @@ public class GUIMain {
                 new Thread(() -> {
                     try {
                         distributorEmployee.distributeItem(item); // Distribute the item
+
                         Thread.sleep((long) ((item.get_time_to_distribute() * 1000) / timeMultiplier)); // Sleep according to the distribution time
+                        
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
                     item.setisdone_distribute(true); // Mark the item as distributed
                     distributorEmployee.incrementItemsDone(); // Increment the distributor's item count
                     // Determine the lane based on item type and update position
@@ -443,6 +448,7 @@ public class GUIMain {
                         }
                         movingObjects.remove(this); // Remove the object from the list
                         SwingUtilities.invokeLater(railPanel::repaint); // Repaint the rail panel
+                        
                     }).start();
                 }
             }
