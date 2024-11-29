@@ -162,7 +162,7 @@ public class GUIMain {
         }).start();
 
         startTime = System.currentTimeMillis();
-        clockTimer = new Timer(100 / timeMultiplier, new ActionListener() {
+        clockTimer = new Timer(1000 / timeMultiplier, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 long currentTime = System.currentTimeMillis();
