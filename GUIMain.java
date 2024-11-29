@@ -555,7 +555,10 @@ public class GUIMain {
             g.drawRect(sorterX + 50, middleY - 200, 200, 100); // Border for plastic sorted
 
             g.drawString("Hours of Working", sorterX - 140, middleY - 180);
-            g.drawString("Plastic Sorted: " + plasticCount, sorterX + 60, middleY - 180);
+            g.drawString("Metal Sorted: " + metalCount, sorterX + 60, middleY - 180);
+            g.drawString("Plastic Sorted: " + plasticCount, sorterX + 60, middleY - 162);
+            g.drawString("Glass Sorted: " + glassCount, sorterX + 60, middleY - 144);
+            g.drawString("Paper Sorted: " + paperCount, sorterX + 60, middleY - 126);
 
             // Calculate and display hours of working based on total items sorted and distributed
             int totalItemsProcessed = sorterCount + distributorCount;
