@@ -435,8 +435,11 @@ public class GUIMain {
             if (!item.isdone_distribute() && isDistributing) {
                 this.y = middleY; // Set the Y position based on the middle line
                 this.x = mainBeltEnd;
-            } else if (item.isdone_distribute()) {
-                x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
+            } 
+              else if (!isDistributing) {
+                x += 5 * timeMultiplier;}
+              else if (item.isdone_distribute()) {
+                //x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
                 if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
                     x = mainBeltEnd + 150; // Stop at the basket
                     // Make the object disappear after 10 seconds
