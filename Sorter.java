@@ -5,26 +5,34 @@ public class Sorter extends Employee {
     public Sorter(Integer employeeNumber, Double workingHours, String name) {
         super(employeeNumber, workingHours, name);
     }
+    public void setExperienceYears(int experienceYears) {
+        super.setExperienceYears(experienceYears);
+        
 
+    }
     @Override
     public double calculateSortTime(Recyclableitem recyclable) {
         Random random = new Random();
         double baseTime = 5.0; // Base time to sort an item
-
-        double experienceModifier = 1.0 - (getExperienceYears() * (random.nextDouble() * 0.1)); // Up to 10% faster per year
-        double tirednessModifier = 1.0 + (getTiredness() * (random.nextDouble() * 0.1)); // Up to 10% slower per tiredness level
-
-        double randomFactor = 0.8 + random.nextDouble() * 0.4; // Random factor between 0.8 and 1.2 for variability
-
+    
+        // Always use the updated experience years
+        double experienceModifier = 1.0 - (getExperienceYears() * (random.nextDouble() * 0.1)); 
+        double tirednessModifier = 1.0 + (getTiredness() * (random.nextDouble() * 0.1)); 
+    
+        double randomFactor = 0.8 + random.nextDouble() * 0.4; 
+    
         double totalModifier = experienceModifier * tirednessModifier * randomFactor;
         double sortTime = baseTime * totalModifier;
+    
         if (sortTime < 1.0) { 
-            sortTime = Math.max(sortTime, 1.0); // Ensure minimum time is 1 second
-            sortTime += 0.1 + (random.nextDouble() * 0.8); // Add random number between 0.1 and 0.9
+            sortTime = Math.max(sortTime, 1.0); 
+            sortTime += 0.1 + (random.nextDouble() * 0.8); 
         }
+    
         recyclable.set_time_to_sort(sortTime);
         return sortTime;
     }
+    
 
     @Override
     public boolean sort(Recyclableitem recyclable) {

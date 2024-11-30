@@ -155,6 +155,20 @@ public class GUIMain {
         speedUp1xButton = new JButton("Play");
         speedUp2xButton = new JButton("x2");
         speedUp4xButton = new JButton("x4");
+        JButton resetTirednessButton = new JButton("Reset Tiredness");
+        resetTirednessButton.setEnabled(false); // Disable initially until the simulation starts
+
+        // Add action listener for the reset tiredness button
+        resetTirednessButton.addActionListener(e -> {
+            if (sorter != null) {
+                sorter.setTiredness(0.0); // Reset the tiredness of the sorter
+                JOptionPane.showMessageDialog(frame, "Tiredness has been reset to 0!", "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("Tiredness reset to 0.");
+            } else {
+                JOptionPane.showMessageDialog(frame, "Sorter is not initialized. Please start the simulation first.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         
         stopButton.setEnabled(false);
         speedUp2xButton.setEnabled(false);
@@ -333,7 +347,6 @@ public class GUIMain {
         clockTimer.start();
         changeExperienceButton.setEnabled(true); // Enable the change experience button
     }
-
     private void changeExperience() {
         String experienceText = JOptionPane.showInputDialog(frame, "Enter new experience value:", "Change Experience", JOptionPane.PLAIN_MESSAGE);
         if (experienceText != null && !experienceText.trim().isEmpty()) {
@@ -343,13 +356,23 @@ public class GUIMain {
                     JOptionPane.showMessageDialog(frame, "Experience must be between 0 and 25 years", "Invalid Input", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+    
+                if (sorter == null) {
+                    JOptionPane.showMessageDialog(frame, "Sorter is not initialized. Please check the code.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
                 sorter.setExperienceYears(newExperience); // Update the experience of the sorter
-                JOptionPane.showMessageDialog(frame, "Experience updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Experience updated successfully to " + newExperience + " years", "Success", JOptionPane.INFORMATION_MESSAGE);
+    
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Please enter a valid number for Experience", "Invalid Input", JOptionPane.WARNING_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(frame, "No input provided for Experience", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
+    
 
     private class MovingObject {
         int x, y;
