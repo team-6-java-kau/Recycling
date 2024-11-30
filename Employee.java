@@ -95,13 +95,13 @@ public class Employee {
 
     public void distributeItem(Recyclableitem item) {
         double distributeTime = calculateDistributeTime(item);
-        System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
+        //System.out.println(getName() + " is distributing " + item.getItemType() + " to the appropriate path. It will take " + distributeTime + " seconds.");
 
         workingHours += distributeTime;
         tiredness += distributeTime * 0.3; // Increment tiredness
         incrementItemsDone();
 
-        switch (item.getItemType()) {
+       /* switch (item.getItemType()) {
             case "Plastic":
                 System.out.println(getName() + " distributed the Plastic path.");                
                 break;
@@ -117,7 +117,7 @@ public class Employee {
             default:
                 System.out.println(getName() + " encountered an unknown item type: " + item.getItemType());
                 break;
-        }
+        }*/ 
      }
     }
   
