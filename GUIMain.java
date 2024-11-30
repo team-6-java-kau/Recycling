@@ -288,8 +288,8 @@ public class GUIMain {
     private void startSimulation() {
         List<Recyclableitem> items = Recyclableitem.createList(numObjects);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
-        Employee sorter = new Employee(1, 5.0, "Moha", experienceInput);
-        Employee distributor = new Employee(2, 5.0, "spotty", experienceInput);
+        Employee sorter = new Sorter(1, 5.0, "Moha", experienceInput);
+        Employee distributor = new Distributor(2, 5.0, "spotty", experienceInput);
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
 
