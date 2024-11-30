@@ -41,24 +41,57 @@ public class GUIMain {
     private JButton speedUp1xButton;
     private JButton stopButton;
     private boolean startButtonPressed = false;
+    private long totalSortingTime = 0;
+    private int totalSortedItems = 0;
+    private Image mainBackgroundImage;
+    private boolean pahse1_done = false;
+    private JButton returnButton;
+    private double totalPlasticWeight = 0;
+    private double totalMetalWeight = 0;
+    private double totalGlassWeight = 0;
+    private double totalPaperWeight = 0;
+    private int totalErrors = 0;
+
 
     public GUIMain() {
         frame = new JFrame("Main Page");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
+        frame.setSize(400, 300);
         frame.setResizable(false);
-        frame.getContentPane().setBackground(Color.decode("#5e5e5e"));
 
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(3, 1));
+        // Load the main background image
+        mainBackgroundImage = new ImageIcon("main-background.jpg").getImage();
 
-        JPanel inputPanel = new JPanel();
+        JPanel mainPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(mainBackgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        mainPanel.setLayout(new BorderLayout());
+
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 20));
+        inputPanel.setOpaque(false);
         inputPanel.add(new JLabel("Number of Objects:"));
         numObjectsField = new JTextField(10);
         inputPanel.add(numObjectsField);
 
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 30));
+        buttonPanel.setOpaque(false);
         JButton phase1Button = new JButton("Phase 1");
         JButton phase2Button = new JButton("Phase 2");
+
+        // Customize buttons
+        phase1Button.setBackground(Color.decode("#4CAF50"));
+        phase1Button.setForeground(Color.WHITE);
+        phase1Button.setPreferredSize(new Dimension(200, 40)); // Set button size
+        phase2Button.setBackground(Color.decode("#2196F3"));
+        phase2Button.setForeground(Color.WHITE);
+        phase2Button.setPreferredSize(new Dimension(200, 40)); // Set button size
+
+        buttonPanel.add(phase1Button);
+        buttonPanel.add(phase2Button);
 
         phase1Button.addActionListener(e -> {
             String numObjectsText = numObjectsField.getText().trim();
@@ -75,7 +108,7 @@ public class GUIMain {
                     JOptionPane.showMessageDialog(frame, 
                         "Number of objects must be greater than 0",
                         "Invalid Input",
-                        JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -90,9 +123,8 @@ public class GUIMain {
 
         phase2Button.addActionListener(e -> startPhase2());
 
-        mainPanel.add(inputPanel);
-        mainPanel.add(phase1Button);
-        mainPanel.add(phase2Button);
+        mainPanel.add(inputPanel, BorderLayout.NORTH);
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
 
         frame.add(mainPanel);
         frame.setVisible(true);
@@ -139,6 +171,11 @@ public class GUIMain {
         JButton startButton = new JButton("Start");
         inputPanel.add(startButton);
 
+        returnButton = new JButton("Return");
+        returnButton.setEnabled(false);
+        returnButton.addActionListener(e -> returnToMainPage());
+        inputPanel.add(returnButton);
+
         startButton.addActionListener(e -> {
             startButton.setEnabled(false);
             if (startButtonPressed) {
@@ -163,7 +200,7 @@ public class GUIMain {
                     JOptionPane.showMessageDialog(frame, 
                         "Experience must be between 0 and 25 years",
                         "Invalid Input",
-                        JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.WARNING_MESSAGE);
                     startButtonPressed = false;
                     startButton.setEnabled(true);
 
@@ -220,6 +257,11 @@ public class GUIMain {
         glassImage = new ImageIcon("GLASS.png").getImage();
         paperImage = new ImageIcon("PAPER.png").getImage();
         errorImage = new ImageIcon("error.png").getImage();
+    }
+
+    private void returnToMainPage() {
+        frame.dispose();
+        new GUIMain();
     }
 
     private void startPhase2() {
@@ -322,13 +364,21 @@ public class GUIMain {
         }
 
         public void draw(Graphics g, int middleY, int mainBeltEnd, int sorterX, int distributorX, int[] lanePositions) {
+
             // Check if the object is at the sorter position and not already sorting
             if (!item.isDone_sorting() && x >= sorterX - 10 && x <= sorterX + 10 && !isSorting) {
                 isSorting = true; // Set the sorting flag to true
                 new Thread(() -> {
                     try {
-                        sorterEmployee.sort(item); // Sort the item
-                        Thread.sleep((long) ((item.get_time_to_sort() * 1000) / timeMultiplier)); // Sleep according to the sorting time
+                        boolean hasError = sorterEmployee.sort(item); // Sort the item
+                        if (item.getsortingError()) {
+                            totalErrors++; // Increment total errors if there is a sorting error
+                            
+                        }
+                        long sortTimeMillis = (long) (item.get_time_to_sort() * 1000);
+                        Thread.sleep(sortTimeMillis / timeMultiplier); // Sleep according to the sorting time
+                        totalSortingTime += sortTimeMillis; // Update total sorting time
+                        totalSortedItems++; // Increment total sorted items
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -365,10 +415,10 @@ public class GUIMain {
                     g.drawImage(image, x, y - 15, 30, 30, null); // Draw the object centered on the middle line
                     
                     if (item.getsortingError()){
-                        g.setColor(Color.RED); // Set the color to black
+                        g.setColor(Color.RED); // Set the color to red for errors
                     }
                     else{
-                        g.setColor(Color.green); // Set the color to black
+                        g.setColor(Color.GREEN); // Set the color to green for correct sorting
                     }
                     g.drawString(item.getItemType(), x, y - 25); // Display the item type
                 }
@@ -397,24 +447,28 @@ public class GUIMain {
                             x = mainBeltEnd + 10 + lanePositions[0]; // Set X position for Metal lane
                             lanePositions[0] += 30; // Space out objects in the lane
                             metalCount++; // Increment metal count
+                            totalMetalWeight += item.getItemWeight(); // Update total metal weight
                             break;
                         case "Plastic":
                             y = middleY - 80; // Set Y position for Plastic lane
                             x = mainBeltEnd + 10 + lanePositions[1]; // Set X position for Plastic lane
                             lanePositions[1] += 30; // Space out objects in the lane
                             plasticCount++; // Increment plastic count
+                            totalPlasticWeight += item.getItemWeight(); // Update total plastic weight
                             break;
                         case "Glass":
                             y = middleY + 40; // Set Y position for Glass lane
                             x = mainBeltEnd + 10 + lanePositions[2]; // Set X position for Glass lane
                             lanePositions[2] += 30; // Space out objects in the lane
                             glassCount++; // Increment glass count
+                            totalGlassWeight += item.getItemWeight(); // Update total glass weight
                             break;
                         case "Paper":
                             y = middleY + 80; // Set Y position for Paper lane
                             x = mainBeltEnd + 10 + lanePositions[3]; // Set X position for Paper lane
                             lanePositions[3] += 30; // Space out objects in the lane
                             paperCount++; // Increment paper count
+                            totalPaperWeight += item.getItemWeight(); // Update total paper weight
                             break;
                     }
                     distributed = true; // Mark the object as distributed
@@ -427,6 +481,19 @@ public class GUIMain {
                         int minutes = (int) (elapsedTime / 60000) % 60;
                         int seconds = (int) (elapsedTime / 1000) % 60;
                         distributingLogArea.append("Item distributed\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
+                        if (allItemsDistributed()) {
+                            try {
+                                Thread.sleep(0); // Sleep for 0.1 seconds
+                                pahse1_done = true;
+                                clockTimer.stop(); // Stop the timer when all objects are distributed
+                                JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
+                                stopButton.setEnabled(false); // Disable the stop button
+                                returnButton.setEnabled(true); // Enable the return button
+
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
                     }); // Print distributed message
                 }).start();
             }
@@ -450,10 +517,18 @@ public class GUIMain {
                         }
                         movingObjects.remove(this); // Remove the object from the list
                         SwingUtilities.invokeLater(railPanel::repaint); // Repaint the rail panel
-                        
                     }).start();
                 }
             }
+        }
+
+        private boolean allItemsDistributed() {
+            for (MovingObject obj : movingObjects) {
+                if (!obj.item.isdone_distribute()) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -504,8 +579,8 @@ public class GUIMain {
             // Draw the distributor employee in front of the main path
             g.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120, this);
             g.setColor(Color.BLACK);
-            g.drawString("Distributor", distributorX - 30, middleY - 60); // Distributor label
-            g.drawString("Distributed: " + distributorCount, distributorX - 30, middleY - 80); // Distributor counter
+            g.drawString("Distributor Employee", distributorX + 50, middleY - 0); // Distributor label
+            g.drawString("Distributed: " + distributorCount, distributorX + 50, middleY - 30); // Distributor counter
 
             // Draw the connecting paths to the additional lanes
             g.setColor(Color.DARK_GRAY);
@@ -539,7 +614,6 @@ public class GUIMain {
             g.fillRect(mainBeltEnd + 160, middleY + 40, 30, 20); // Glass basket
             g.fillRect(mainBeltEnd + 160, middleY + 80, 30, 20); // Paper basket
 
-            // Draw the counters for each material type
             g.setColor(Color.BLACK);
             g.setFont(new Font("Times New Roman", Font.PLAIN, 12));
             g.drawString("Metal: " + metalCount, mainBeltEnd + 200, middleY - 110);
@@ -547,22 +621,36 @@ public class GUIMain {
             g.drawString("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
             g.drawString("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
 
-            // Draw the big squares for hours of working and plastic sorted
+            // Draw the additional information box
             g.setColor(Color.WHITE);
-            g.fillRect(sorterX - 150, middleY - 200, 200, 100); // Square for hours of working
-            g.fillRect(sorterX + 50, middleY - 200, 200, 100); // Square for plastic sorted
+            g.fillRect(sorterX - 150, middleY - 350, 400, 230); // Square for additional information
 
             g.setColor(Color.BLACK);
-            g.drawRect(sorterX - 150, middleY - 200, 200, 100); // Border for hours of working
-            g.drawRect(sorterX + 50, middleY - 200, 200, 100); // Border for plastic sorted
+            g.drawRect(sorterX - 150, middleY - 350, 400, 230); // Border for additional information
 
-            g.drawString("Hours of Working", sorterX - 140, middleY - 180);
-            g.drawString("Plastic Sorted: " + plasticCount, sorterX + 60, middleY - 180);
+            g.drawString("Number of Objects Done: " + totalSortedItems, sorterX - 140, middleY - 330);
+            g.drawString("Number of Errors: " + totalErrors, sorterX - 140, middleY - 310);
+            g.drawString("Tons Done for Each Material:", sorterX - 140, middleY - 290);
+            g.drawString("Plastic: " + totalPlasticWeight / 1000 + " tons", sorterX - 140, middleY - 270);
+            g.drawString("Metal: " + totalMetalWeight / 1000 + " tons", sorterX - 140, middleY - 250);
+            g.drawString("Glass: " + totalGlassWeight / 1000 + " tons", sorterX - 140, middleY - 230);
+            g.drawString("Paper: " + totalPaperWeight / 1000 + " tons", sorterX - 140, middleY - 210);
 
             // Calculate and display hours of working based on total items sorted and distributed
-            int totalItemsProcessed = sorterCount + distributorCount;
-            int hoursOfWorking = totalItemsProcessed / 25;
-            g.drawString("Hours: " + hoursOfWorking, sorterX - 140, middleY - 160);
+          
+
+            // Calculate and display total sorting time
+            long totalSortingSeconds = totalSortingTime / 1000;
+            int sortingHours = (int) (totalSortingSeconds / 3600);
+            int sortingMinutes = (int) (totalSortingSeconds / 60) % 60;
+            int sortingSeconds = (int) (totalSortingSeconds % 60);
+            g.drawString(String.format("Total Sorting Time: %02d:%02d:%02d", sortingHours, sortingMinutes, sortingSeconds), sorterX - 140, middleY - 190);
+
+            // Calculate and display average sorting time
+            double averageSortingTime = totalSortedItems > 0 ? (double) totalSortingTime / totalSortedItems / 1000 : 0;
+            int avgSortingMinutes = (int) (averageSortingTime / 60);
+            int avgSortingSeconds = (int) (averageSortingTime % 60);
+            g.drawString(String.format("Average Sorting Time: %02d:%02d", avgSortingMinutes, avgSortingSeconds), sorterX - 140, middleY - 170);
 
             // Draw the moving objects
             for (MovingObject obj : movingObjects) {
@@ -570,6 +658,7 @@ public class GUIMain {
             }
         }
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(GUIMain::new);
