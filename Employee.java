@@ -9,11 +9,11 @@ public abstract class Employee {
     private Integer itemsDone;
     private Integer errorsNum;
 
-    public Employee(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {
+    public Employee(Integer employeeNumber, Double workingHours, String name) {
         this.employeeNumber = employeeNumber;
         this.workingHours = workingHours;
         this.name = name;
-        this.experienceYears = experienceYears;
+        this.experienceYears = 0;
         this.tiredness = 0.0;
         this.itemsDone = 0;
         this.errorsNum = 0;

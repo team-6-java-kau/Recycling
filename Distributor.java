@@ -2,8 +2,8 @@
 import java.util.Random;
 
 public class Distributor extends Employee {
-    public Distributor(Integer employeeNumber, Double workingHours, String name, Integer experienceYears) {
-        super(employeeNumber, workingHours, name, experienceYears);
+    public Distributor(Integer employeeNumber, Double workingHours, String name) {
+        super(employeeNumber, workingHours, name);
     }
 
     @Override

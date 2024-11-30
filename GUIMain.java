@@ -51,6 +51,9 @@ public class GUIMain {
     private double totalGlassWeight = 0;
     private double totalPaperWeight = 0;
     private int totalErrors = 0;
+    private JButton changeExperienceButton;
+    private Sorter sorter; // Change to Sorter type
+    private Distributor distributor; // Change to Distributor type
 
 
     public GUIMain() {
@@ -176,6 +179,12 @@ public class GUIMain {
         returnButton.addActionListener(e -> returnToMainPage());
         inputPanel.add(returnButton);
 
+        // Add the change experience button
+        changeExperienceButton = new JButton("Change Experience");
+        changeExperienceButton.setEnabled(false);
+        changeExperienceButton.addActionListener(e -> changeExperience());
+        inputPanel.add(changeExperienceButton);
+
         startButton.addActionListener(e -> {
             startButton.setEnabled(false);
             if (startButtonPressed) {
@@ -288,8 +297,9 @@ public class GUIMain {
     private void startSimulation() {
         List<Recyclableitem> items = Recyclableitem.createList(numObjects);
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
-        Employee sorter = new Sorter(1, 5.0, "Moha", experienceInput);
-        Employee distributor = new Distributor(2, 5.0, "spotty", experienceInput);
+        sorter = new Sorter(1, 5.0, "Moha");
+        distributor = new Distributor(2, 5.0, "spotty");
+        sorter.setExperienceYears(experienceInput); // Set initial experience
         railPanel.setMovingObjects(movingObjects);
         railPanel.repaint();
 
@@ -321,9 +331,25 @@ public class GUIMain {
             }
         });
         clockTimer.start();
+        changeExperienceButton.setEnabled(true); // Enable the change experience button
     }
-    
-   
+
+    private void changeExperience() {
+        String experienceText = JOptionPane.showInputDialog(frame, "Enter new experience value:", "Change Experience", JOptionPane.PLAIN_MESSAGE);
+        if (experienceText != null && !experienceText.trim().isEmpty()) {
+            try {
+                int newExperience = Integer.parseInt(experienceText.trim());
+                if (newExperience < 0 || newExperience > 25) {
+                    JOptionPane.showMessageDialog(frame, "Experience must be between 0 and 25 years", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                sorter.setExperienceYears(newExperience); // Update the experience of the sorter
+                JOptionPane.showMessageDialog(frame, "Experience updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Please enter a valid number for Experience", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
 
     private class MovingObject {
         int x, y;
@@ -575,6 +601,12 @@ public class GUIMain {
             g.setColor(Color.BLACK);
             g.drawString("Sorter Employee", sorterX - 30, middleY - 70); // Sorter label
             g.drawString("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
+
+            // Display the experience of the sorter employee
+            if (!movingObjects.isEmpty()) {
+                Employee sorterEmployee = movingObjects.get(0).sorterEmployee;
+                g.drawString("Experience: " + sorterEmployee.getExperienceYears() + " years", sorterX - 30, middleY - 110);
+            }
 
             // Draw the distributor employee in front of the main path
             g.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120, this);
