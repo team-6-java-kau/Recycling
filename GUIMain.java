@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -267,7 +268,7 @@ public class GUIMain {
         frame.add(inputPanel, BorderLayout.NORTH);
         frame.setVisible(true);
 
-        movingObjects = new ArrayList<>();
+        movingObjects = new CopyOnWriteArrayList<>();
 
         // Load the background image
         backgroundImage = new ImageIcon("packaging-closing-machine.jpg").getImage();
