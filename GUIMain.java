@@ -414,7 +414,6 @@ public class GUIMain {
         }
 
         public void draw(Graphics g, int middleY, int mainBeltEnd, int sorterX, int distributorX, int[] lanePositions) {
-
             // Check if the object is at the sorter position and not already sorting
             if (!item.isDone_sorting() && x >= sorterX - 10 && x <= sorterX + 10 && !isSorting) {
                 isSorting = true; // Set the sorting flag to true
@@ -472,7 +471,6 @@ public class GUIMain {
                     }
                     g.drawString(item.getItemType(), x, y - 25); // Display the item type
                 }
-                x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
             }
 
             // Check if the object is at the distributor position and not already distributing
@@ -495,28 +493,24 @@ public class GUIMain {
                         case "Metal":
                             y = middleY - 120; // Set Y position for Metal lane
                             x = mainBeltEnd + 10 + lanePositions[0]; // Set X position for Metal lane
-                            lanePositions[0] += 30; // Space out objects in the lane
                             metalCount++; // Increment metal count
                             totalMetalWeight += item.getItemWeight(); // Update total metal weight
                             break;
                         case "Plastic":
                             y = middleY - 80; // Set Y position for Plastic lane
                             x = mainBeltEnd + 10 + lanePositions[1]; // Set X position for Plastic lane
-                            lanePositions[1] += 30; // Space out objects in the lane
                             plasticCount++; // Increment plastic count
                             totalPlasticWeight += item.getItemWeight(); // Update total plastic weight
                             break;
                         case "Glass":
                             y = middleY + 40; // Set Y position for Glass lane
                             x = mainBeltEnd + 10 + lanePositions[2]; // Set X position for Glass lane
-                            lanePositions[2] += 30; // Space out objects in the lane
                             glassCount++; // Increment glass count
                             totalGlassWeight += item.getItemWeight(); // Update total glass weight
                             break;
                         case "Paper":
                             y = middleY + 80; // Set Y position for Paper lane
                             x = mainBeltEnd + 10 + lanePositions[3]; // Set X position for Paper lane
-                            lanePositions[3] += 30; // Space out objects in the lane
                             paperCount++; // Increment paper count
                             totalPaperWeight += item.getItemWeight(); // Update total paper weight
                             break;
@@ -555,13 +549,12 @@ public class GUIMain {
             } 
                 
               else if (item.isdone_distribute()) {
-                x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
                 if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
                     x = mainBeltEnd + 150; // Stop at the basket
                     // Make the object disappear after 10 seconds
                     new Thread(() -> {
                         try {
-                            Thread.sleep(10000); // Wait for 10 seconds
+                            Thread.sleep(10); // Wait for 10 seconds
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -572,6 +565,27 @@ public class GUIMain {
             }
         }
 
+        public void updatePosition() {
+            while (true) {
+                if (!item.isDone_sorting() && !isSorting) {
+                    x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
+                    break;
+                }
+                
+                if (item.isDone_sorting() && !item.isdone_distribute() && !isDistributing) {
+                    x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
+                    break;
+                }
+                
+                if (item.isdone_distribute()) {
+                    x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
+                    break;
+                }
+                
+                break; // Ensure the loop terminates if none of the conditions are true
+            }
+        }
+        
         private boolean allItemsDistributed() {
             for (MovingObject obj : movingObjects) {
                 if (!obj.item.isdone_distribute()) {
@@ -630,7 +644,7 @@ public class GUIMain {
             if (!movingObjects.isEmpty()) {
                 Employee sorterEmployee = movingObjects.get(0).sorterEmployee;
                 g.drawString("Experience: " + sorterEmployee.getExperienceYears() + " years", sorterX - 30, middleY - 110);
-                g.drawString("Tiredness: " + sorterEmployee.getTiredness(), sorterX - 30, middleY - 130);
+                g.drawString(String.format("Tiredness: %.2f", sorterEmployee.getTiredness()), sorterX - 30, middleY - 130);
 
             }
 
@@ -689,10 +703,10 @@ public class GUIMain {
             g.drawString("Number of Objects Done: " + distributorCount, sorterX - 140, middleY - 330);
             g.drawString("Number of Errors: " + totalErrors, sorterX - 140, middleY - 310);
             g.drawString("Tons Done for Each Material:", sorterX - 140, middleY - 290);
-            g.drawString("Plastic: " + totalPlasticWeight / 1000 + " tons", sorterX - 140, middleY - 270);
-            g.drawString("Metal: " + totalMetalWeight / 1000 + " tons", sorterX - 140, middleY - 250);
-            g.drawString("Glass: " + totalGlassWeight / 1000 + " tons", sorterX - 140, middleY - 230);
-            g.drawString("Paper: " + totalPaperWeight / 1000 + " tons", sorterX - 140, middleY - 210);
+            g.drawString("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons", sorterX - 140, middleY - 270);
+            g.drawString("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons", sorterX - 140, middleY - 250);
+            g.drawString("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons", sorterX - 140, middleY - 230);
+            g.drawString("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons", sorterX - 140, middleY - 210);
 
             // Calculate and display hours of working based on total items sorted and distributed
           
@@ -712,6 +726,7 @@ public class GUIMain {
 
             // Draw the moving objects
             for (MovingObject obj : movingObjects) {
+                obj.updatePosition(); // Update position here
                 obj.draw(g, middleY, mainBeltEnd, sorterX, distributorX, lanePositions);
             }
         }
