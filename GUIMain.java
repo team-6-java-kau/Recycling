@@ -55,6 +55,7 @@ public class GUIMain {
     private JButton changeExperienceButton;
     private Sorter sorter; // Change to Sorter type
     private Distributor distributor; // Change to Distributor type
+    private JButton resetTirednessButton;
 
 
     public GUIMain() {
@@ -156,13 +157,15 @@ public class GUIMain {
         speedUp1xButton = new JButton("Play");
         speedUp2xButton = new JButton("x2");
         speedUp4xButton = new JButton("x4");
-        JButton resetTirednessButton = new JButton("Reset Tiredness");
+        resetTirednessButton = new JButton("Reset Tiredness");
         resetTirednessButton.setEnabled(false); // Disable initially until the simulation starts
 
         // Add action listener for the reset tiredness button
         resetTirednessButton.addActionListener(e -> {
             if (sorter != null) {
                 sorter.setTiredness(0.0); // Reset the tiredness of the sorter
+                distributor.setTiredness(0.0); 
+
                 JOptionPane.showMessageDialog(frame, "Tiredness has been reset to 0!", "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
                 System.out.println("Tiredness reset to 0.");
             } else {
@@ -180,6 +183,7 @@ public class GUIMain {
         inputPanel.add(speedUp1xButton);
         inputPanel.add(speedUp2xButton);
         inputPanel.add(speedUp4xButton);
+        inputPanel.add(resetTirednessButton);
         
         stopButton.addActionListener(e -> setTimeMultiplier(0));
         speedUp2xButton.addActionListener(e -> setTimeMultiplier(2));
@@ -347,6 +351,7 @@ public class GUIMain {
         });
         clockTimer.start();
         changeExperienceButton.setEnabled(true); // Enable the change experience button
+        resetTirednessButton.setEnabled(true); // Enable the reset tiredness button
     }
     private void changeExperience() {
         String experienceText = JOptionPane.showInputDialog(frame, "Enter new experience value:", "Change Experience", JOptionPane.PLAIN_MESSAGE);
