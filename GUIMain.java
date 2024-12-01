@@ -525,19 +525,6 @@ public class GUIMain {
                         int minutes = (int) (elapsedTime / 60000) % 60;
                         int seconds = (int) (elapsedTime / 1000) % 60;
                         distributingLogArea.append("Item distributed\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
-                        if (allItemsDistributed()) {
-                            try {
-                                Thread.sleep(0); // Sleep for 0.1 seconds
-                                pahse1_done = true;
-                                clockTimer.stop(); // Stop the timer when all objects are distributed
-                                JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
-                                stopButton.setEnabled(false); // Disable the stop button
-                                returnButton.setEnabled(true); // Enable the return button
-
-                            } catch (InterruptedException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
                     }); // Print distributed message
                 }).start();
             }
@@ -554,7 +541,14 @@ public class GUIMain {
                     // Make the object disappear after 10 seconds
                     new Thread(() -> {
                         try {
-                            Thread.sleep(10); // Wait for 10 seconds
+                            Thread.sleep(0); // Wait for 10 seconds
+                           if (allItemsDistributed()) {
+                                pahse1_done = true;
+                                clockTimer.stop(); // Stop the timer when all objects are distributed
+                                JOptionPane.showMessageDialog(frame, "Simulation completed!", "Simulation Status", JOptionPane.INFORMATION_MESSAGE);
+                                stopButton.setEnabled(false); // Disable the stop button
+                                returnButton.setEnabled(true); // Enable the return button
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -563,6 +557,7 @@ public class GUIMain {
                     }).start();
                 }
             }
+
         }
 
         public void updatePosition() {
@@ -584,7 +579,12 @@ public class GUIMain {
                 
                 break; // Ensure the loop terminates if none of the conditions are true
             }
-        }
+
+
+
+            }
+
+        
         
         private boolean allItemsDistributed() {
             for (MovingObject obj : movingObjects) {
@@ -645,6 +645,7 @@ public class GUIMain {
                 Employee sorterEmployee = movingObjects.get(0).sorterEmployee;
                 g.drawString("Experience: " + sorterEmployee.getExperienceYears() + " years", sorterX - 30, middleY - 110);
                 g.drawString(String.format("Tiredness: %.2f", sorterEmployee.getTiredness()), sorterX - 30, middleY - 130);
+                g.drawString(String.format("Tiredness: %.2f", distributor.getTiredness()), distributorX + 50, middleY - 40);
 
             }
 
@@ -652,7 +653,7 @@ public class GUIMain {
             g.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120, this);
             g.setColor(Color.BLACK);
             g.drawString("Distributor Employee", distributorX + 50, middleY - 0); // Distributor label
-            g.drawString("Distributed: " + distributorCount, distributorX + 50, middleY - 30); // Distributor counter
+            g.drawString("Distributed: " + distributorCount, distributorX + 50, middleY - 20); // Distributor counter
 
             // Draw the connecting paths to the additional lanes
             g.setColor(Color.DARK_GRAY);
@@ -728,7 +729,9 @@ public class GUIMain {
             for (MovingObject obj : movingObjects) {
                 obj.updatePosition(); // Update position here
                 obj.draw(g, middleY, mainBeltEnd, sorterX, distributorX, lanePositions);
+
             }
+
         }
     }
 
