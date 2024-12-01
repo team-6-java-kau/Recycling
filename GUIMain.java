@@ -629,6 +629,8 @@ public class GUIMain {
             if (!movingObjects.isEmpty()) {
                 Employee sorterEmployee = movingObjects.get(0).sorterEmployee;
                 g.drawString("Experience: " + sorterEmployee.getExperienceYears() + " years", sorterX - 30, middleY - 110);
+                g.drawString("Tiredness: " + sorterEmployee.getTiredness(), sorterX - 30, middleY - 130);
+
             }
 
             // Draw the distributor employee in front of the main path
@@ -678,12 +680,12 @@ public class GUIMain {
 
             // Draw the additional information box
             g.setColor(Color.WHITE);
-            g.fillRect(sorterX - 150, middleY - 350, 400, 230); // Square for additional information
+            g.fillRect(sorterX - 150, middleY - 350, 400, 190); // Square for additional information
 
             g.setColor(Color.BLACK);
-            g.drawRect(sorterX - 150, middleY - 350, 400, 230); // Border for additional information
+            g.drawRect(sorterX - 150, middleY - 350, 400, 190); // Border for additional information
 
-            g.drawString("Number of Objects Done: " + totalSortedItems, sorterX - 140, middleY - 330);
+            g.drawString("Number of Objects Done: " + distributorCount, sorterX - 140, middleY - 330);
             g.drawString("Number of Errors: " + totalErrors, sorterX - 140, middleY - 310);
             g.drawString("Tons Done for Each Material:", sorterX - 140, middleY - 290);
             g.drawString("Plastic: " + totalPlasticWeight / 1000 + " tons", sorterX - 140, middleY - 270);
