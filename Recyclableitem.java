@@ -51,16 +51,28 @@ public class Recyclableitem {
 
             switch (type) {
                 case 0:
-                    items.add(new Plastic(itemWeight));
+                    Plastic plastic = new Plastic(itemWeight);
+                    if (random.nextBoolean()) {
+                        plastic.compress();
+                    }
+                    items.add(plastic);
                     break;
                 case 1:
-                    items.add(new Metal(itemWeight * 4));
+                    Metal metal = new Metal(itemWeight * 4);
+                    if (random.nextBoolean()) {
+                        metal.compress();
+                    }
+                    items.add(metal);
                     break;
                 case 2:
                     items.add(new Glass(itemWeight * 2));
                     break;
                 case 3:
-                    items.add(new Paper(itemWeight * 0.2));
+                    Paper paper = new Paper(itemWeight * 0.2);
+                    if (random.nextBoolean()) {
+                        paper.compress();
+                    }
+                    items.add(paper);
                     break;
             }
         }
