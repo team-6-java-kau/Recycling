@@ -5,19 +5,13 @@ public class Distributor extends Employee {
     public Distributor(Integer employeeNumber, Double workingHours, String name) {
         super(employeeNumber, workingHours, name);
     }
-
-    @Override
-    public double calculateSortTime(Recyclableitem recyclable) {
-        throw new UnsupportedOperationException("Distributor does not implement sort");
-    }
-
     @Override
     public boolean sort(Recyclableitem recyclable) {
         throw new UnsupportedOperationException("Distributor does not implement sort");
     }
 
     @Override
-    public double calculateDistributeTime(Recyclableitem item) {
+    public double calculateTime(Recyclableitem item) {
         Random random = new Random();
         double baseTime = 3.0; // Base time to distribute an item, more than sorting time
 
@@ -40,7 +34,7 @@ public class Distributor extends Employee {
 
     @Override
     public void distributeItem(Recyclableitem item) {
-        double distributeTime = calculateDistributeTime(item);
+        double distributeTime = calculateTime(item);
 
         setWorkingHours(getWorkingHours() + distributeTime);
         setTiredness(getTiredness() + distributeTime * 0.3); // Increment tiredness

@@ -11,7 +11,7 @@ public class Sorter extends Employee {
 
     }
     @Override
-    public double calculateSortTime(Recyclableitem recyclable) {
+    public double calculateTime(Recyclableitem recyclable) {
         Random random = new Random();
         double baseTime = 5.0; // Base time to sort an item
     
@@ -37,7 +37,7 @@ public class Sorter extends Employee {
     @Override
     public boolean sort(Recyclableitem recyclable) {
         Random random = new Random();
-        double sortTime = calculateSortTime(recyclable);
+        double sortTime = calculateTime(recyclable);
 
         setWorkingHours(getWorkingHours() + sortTime);
         setTiredness(getTiredness() + sortTime * 0.1); // Increment tiredness
@@ -53,10 +53,6 @@ public class Sorter extends Employee {
         return !hasError;
     }
 
-    @Override
-    public double calculateDistributeTime(Recyclableitem item) {
-        throw new UnsupportedOperationException("Sorter does not implement distributeItem");
-    }
 
     @Override
     public void distributeItem(Recyclableitem item) {

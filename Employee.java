@@ -34,9 +34,9 @@ public abstract class Employee {
     public void incrementItemsDone() { this.itemsDone++; }
     public void incrementerrorsNum() { this.errorsNum++; }
 
-    public abstract double calculateSortTime(Recyclableitem recyclable);
     public abstract boolean sort(Recyclableitem recyclable);
-    public abstract double calculateDistributeTime(Recyclableitem item);
+    public abstract double calculateTime(Recyclableitem item);
     public abstract void distributeItem(Recyclableitem item);
+    
 }
 
