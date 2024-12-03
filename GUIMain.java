@@ -12,6 +12,7 @@ public class GUIMain {
     private JTextField experienceField;
     private JTextField numObjectsField;
     private int numObjects;
+    private JTextArea outputArea;
     private RailPanel railPanel;
     private List<MovingObject> movingObjects;
     private Timer clockTimer;
@@ -423,7 +424,7 @@ public class GUIMain {
                 isSorting = true; // Set the sorting flag to true
                 new Thread(() -> {
                     try {
-                        sorterEmployee.sort(item); // Sort the item
+                        boolean hasError = sorterEmployee.sort(item); // Sort the item
                         if (item.getsortingError()) {
                             totalErrors++; // Increment total errors if there is a sorting error
                             
