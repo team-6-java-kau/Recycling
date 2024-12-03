@@ -1,4 +1,3 @@
-
 import java.util.Random;
 
 public class Distributor extends Employee {
@@ -28,8 +27,8 @@ public class Distributor extends Employee {
         if (item instanceof Compressible) {
             Compressible compressible = (Compressible) item;
             if (!compressible.isCompressed()) {
-                compress = 1 + random.nextInt(3); // Random time between 1 and 3 seconds }
-                }
+                compress = 1 + random.nextInt(3); // Random time between 1 and 3 seconds
+            }
         }
         double totalModifier = weightModifier * tirednessModifier * randomFactor;
         double distributeTime = baseTime * totalModifier + compress;
