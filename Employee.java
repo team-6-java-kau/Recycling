@@ -1,3 +1,4 @@
+
 public abstract class Employee {
     private Integer employeeNumber;
     private Double workingHours;
@@ -24,15 +25,11 @@ public abstract class Employee {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public Integer getExperienceYears() { return experienceYears; }
-    public void setExperienceYears(Integer experienceYears) { 
-        this.experienceYears = experienceYears; 
-        System.out.println("Experience years updated to: " + experienceYears + "----" + getTiredness()); 
-    }
+    public void setExperienceYears(Integer experienceYears) { this.experienceYears = experienceYears; System.out.println("Experience years updated to: " + experienceYears+"----"+ getTiredness()); }
     public Double getTiredness() { return tiredness; }
     public void setTiredness(Double tiredness) { this.tiredness = tiredness; }
     public Integer getItemsDone() { return itemsDone; }
     public void setItemsDone(Integer itemsDone) { this.itemsDone = itemsDone; }
-    public Integer getErrorsNum() { return errorsNum; }
     
     public void incrementItemsDone() { this.itemsDone++; }
     public void incrementerrorsNum() { this.errorsNum++; }

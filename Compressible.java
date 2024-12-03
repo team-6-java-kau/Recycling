@@ -1,6 +1,7 @@
 // Define the Compressible interface
 public interface Compressible {
-    void compress();
+    boolean isCompressed = false;
     boolean isCompressed();
+    void compress();
 }
 
