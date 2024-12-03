@@ -229,19 +229,23 @@ public class GUIMain extends Application {
 
         sortingLogArea = new TextArea();
         sortingLogArea.setEditable(false);
-        sortingLogArea.setPrefHeight(450);
+        sortingLogArea.setPrefHeight(150); // Adjusted height
+        sortingLogArea.setPrefWidth(300); // Adjusted width
 
         distributingLogArea = new TextArea();
         distributingLogArea.setEditable(false);
-        distributingLogArea.setPrefHeight(450);
+        distributingLogArea.setPrefHeight(150); // Adjusted height
+        distributingLogArea.setPrefWidth(300); // Adjusted width
 
-        VBox logBox = new VBox(10);
+        HBox logBox = new HBox(10);
+        logBox.setAlignment(Pos.CENTER);
         logBox.getChildren().addAll(new Label("Sorting Log:"), sortingLogArea, new Label("Distributing Log:"), distributingLogArea);
 
-        HBox mainBox = new HBox(10);
-        mainBox.getChildren().addAll(inputBox, buttonBox, logBox);
+        VBox mainBox = new VBox(10);
+        mainBox.getChildren().addAll(inputBox, buttonBox, railPane);
+        mainPane.getChildren().addAll(mainBox, logBox);
 
-        mainPane.getChildren().add(mainBox);
+        logBox.setLayoutY(750); // Position the log box at the bottom of the screen
 
         Scene scene = new Scene(mainPane, 1300, 900);
         stage.setScene(scene);
@@ -518,20 +522,24 @@ public class GUIMain extends Application {
                     new Thread(() -> {
                         try {
                             Thread.sleep(10000); // Wait for 10 seconds
-                            if (allItemsDistributed()) {
-                                pahse1_done = true;
-                                clockTimer.stop(); // Stop the timer when all objects are distributed
-                                javafx.application.Platform.runLater(() -> {
-                                    showAlert(AlertType.INFORMATION, "Simulation Status", "Simulation completed!");
+                            javafx.application.Platform.runLater(() -> {
+                                movingObjects.remove(this); // Remove the object from the list
+                                railPane.repaint(); // Repaint the rail panel
+                                if (allItemsDistributed() && !pahse1_done) {
+                                    pahse1_done = true;
+                                    clockTimer.stop(); // Stop the timer when all objects are distributed
+                                    Alert alert = new Alert(AlertType.INFORMATION);
+                                    alert.setTitle("Simulation Status");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText("Simulation completed!");
+                                    alert.showAndWait(); // Wait for the user to press OK
                                     stopButton.setDisable(true); // Disable the stop button
                                     returnButton.setDisable(false); // Enable the return button
-                                });
-                            }
+                                }
+                            });
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        movingObjects.remove(this); // Remove the object from the list
-                        javafx.application.Platform.runLater(railPane::repaint); // Repaint the rail panel
                     }).start();
                 }
             }
@@ -670,13 +678,8 @@ public class GUIMain extends Application {
             gc.fillText("Plastic: " + plasticCount, mainBeltEnd + 200, middleY - 70);
             gc.fillText("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
             gc.fillText("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
-
-            // Draw the additional information box
-            gc.setFill(Color.WHITE);
-            gc.fillRect(sorterX - 150, middleY - 350, 400, 190); // Square for additional information
-
-            gc.setStroke(Color.BLACK);
-            gc.strokeRect(sorterX - 150, middleY - 350, 400, 190); // Border for additional information
+            
+            
 
             gc.fillText("Number of Objects Done: " + distributorCount, sorterX - 140, middleY - 330);
             gc.fillText("Number of Errors: " + totalErrors, sorterX - 140, middleY - 310);
@@ -685,6 +688,9 @@ public class GUIMain extends Application {
             gc.fillText("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons", sorterX - 140, middleY - 250);
             gc.fillText("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons", sorterX - 140, middleY - 230);
             gc.fillText("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons", sorterX - 140, middleY - 210);
+
+            // Calculate and display hours of working based on total items sorted and distributed
+
 
             // Calculate and display total sorting time
             long totalSortingSeconds = totalSortingTime / 1000;
