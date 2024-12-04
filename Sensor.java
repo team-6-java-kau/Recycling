@@ -1,13 +1,11 @@
-
-public class Automation {
+public class Sensor extends Employee {
     private Integer sensorNumber;
     private Double workingHours;
     private Integer itemsDone;
     private Integer errorsNum;
 
-    public Automation(Integer sensorNumber, Double workingHours) {
-        this.sensorNumber = sensorNumber;
-        this.workingHours = workingHours;
+    public Sensor(Integer employeeNumber, Double workingHours, String name) {
+        super(employeeNumber, workingHours, name);
         this.itemsDone = 0;
         this.errorsNum = 0;
     }
@@ -24,25 +22,29 @@ public class Automation {
     public void incrementItemsDone() { this.itemsDone++; }
     public void incrementErrorsNum() { this.errorsNum++; }
 
+    @Override
     public double calculateSortTime(Recyclableitem recyclable) {
         double sortTime = 0.0;
         recyclable.set_time_to_sort(sortTime);
         return sortTime;
     }
 
-    public void sort(Recyclableitem recyclable) {
+    @Override
+    public boolean sort(Recyclableitem recyclable) {
         double sortTime = calculateSortTime(recyclable);
         setWorkingHours(getWorkingHours() + sortTime);
         incrementItemsDone();
+        return true; // Sensors do not produce errors
     }
 
+    @Override
     public double calculateDistributeTime(Recyclableitem item) {
-        double baseTime = 0.0; 
-        double distributeTime = baseTime;
+        double distributeTime = 0.0;
         item.set_time_to_distribute(distributeTime);
         return distributeTime;
     }
 
+    @Override
     public void distributeItem(Recyclableitem item) {
         double distributeTime = calculateDistributeTime(item);
         setWorkingHours(getWorkingHours() + distributeTime);

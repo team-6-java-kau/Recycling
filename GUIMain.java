@@ -113,6 +113,7 @@ public class GUIMain extends Application {
                 showAlert(AlertType.WARNING, "Invalid Input", "Please enter a valid number for the number of objects");
                 return;
             }
+
             startPhase1();
         });
 
@@ -306,16 +307,183 @@ public class GUIMain extends Application {
     private void startPhase2() {
         stage.close();
         stage = new Stage();
-        stage.setTitle("Phase 2");
+        stage.setTitle("Phase 2 - Automation");
 
-        Label label = new Label("Phase 2 Page");
-        label.setAlignment(Pos.CENTER);
+        GridPane mainPane = new GridPane();
+        mainPane.setAlignment(Pos.CENTER);
+        mainPane.setPadding(new Insets(20));
+        mainPane.setHgap(10);
+        mainPane.setVgap(10);
+        mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Scene scene = new Scene(new StackPane(label), 1600, 900);
+        Label experienceLabel = new Label("Experience:");
+        experienceLabel.setTextFill(Color.WHITE);
+        experienceField = new TextField();
+        timeLabel = new Label("Time: 00:00:00");
+        timeLabel.setTextFill(Color.WHITE);
+
+        stopButton = new Button("Pause");
+        speedUp1xButton = new Button("Play");
+        speedUp2xButton = new Button("x2");
+        speedUp4xButton = new Button("x4");
+        resetTirednessButton = new Button("Reset Tiredness");
+        resetTirednessButton.setDisable(true);
+
+        stopButton.setDisable(true);
+        speedUp2xButton.setDisable(true);
+        speedUp4xButton.setDisable(true);
+        speedUp1xButton.setDisable(true);
+
+        Button startButton = new Button("Start");
+        returnButton = new Button("Return");
+        returnButton.setDisable(true);
+        returnButton.setOnAction(e -> returnToMainPage());
+
+        startButton.setOnAction(e -> {
+            startButton.setDisable(true);
+            if (startButtonPressed) {
+                return;
+            }
+            startButtonPressed = true;
+            System.out.println("Start button clicked");
+            String experienceText = experienceField.getText().trim();
+            if (experienceText.isEmpty()) {
+                showAlert(AlertType.WARNING, "Input Required", "Please enter Experience value");
+                startButtonPressed = false;
+                startButton.setDisable(false);
+                return;
+            }
+            try {
+                int experienceInput = Integer.parseInt(experienceText);
+                if (experienceInput < 0 || experienceInput > 25) {
+                    showAlert(AlertType.WARNING, "Invalid Input", "Experience must be between 0 and 25 years");
+                    startButtonPressed = false;
+                    startButton.setDisable(false);
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                showAlert(AlertType.WARNING, "Invalid Input", "Please enter a valid number for Experience");
+                startButtonPressed = false;
+                return;
+            }
+            stopButton.setDisable(false);
+            speedUp2xButton.setDisable(false);
+            speedUp4xButton.setDisable(false);
+            speedUp1xButton.setDisable(false);
+            startAutomationSimulation();
+        });
+
+        // Define event handlers for speed-up buttons
+        speedUp1xButton.setOnAction(e -> {
+            setTimeMultiplier(1);
+            resumeSimulation();
+        });
+        speedUp2xButton.setOnAction(e -> {
+            setTimeMultiplier(2);
+            resumeSimulation();
+        });
+        speedUp4xButton.setOnAction(e -> {
+            setTimeMultiplier(4);
+            resumeSimulation();
+        });
+        stopButton.setOnAction(e -> {
+            setTimeMultiplier(0);
+            pauseSimulation();
+        });
+
+        railPane = new RailPane();
+        sortingLogArea = new TextArea();
+        sortingLogArea.setEditable(false);
+        sortingLogArea.setPrefHeight(300);
+        sortingLogArea.setPrefWidth(300);
+
+        distributingLogArea = new TextArea();
+        distributingLogArea.setEditable(false);
+        distributingLogArea.setPrefHeight(300);
+        distributingLogArea.setPrefWidth(300);
+
+        // Add components to the grid with specific positions
+        mainPane.add(experienceLabel, 0, 0);
+        mainPane.add(experienceField, 1, 0);
+        mainPane.add(timeLabel, 0, 1, 2, 1);
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, resetTirednessButton, startButton, returnButton);
+        mainPane.add(buttonBox, 0, 2, 2, 1);
+
+        mainPane.add(railPane, 0, 3, 2, 1);
+
+        VBox logBox = new VBox(10);
+        Label sortingLogLabel = new Label("Sorting Log:");
+        sortingLogLabel.setTextFill(Color.WHITE);
+        Label distributingLogLabel = new Label("Distributing Log:");
+        distributingLogLabel.setTextFill(Color.WHITE);
+        logBox.getChildren().addAll(sortingLogLabel, sortingLogArea, distributingLogLabel, distributingLogArea);
+        mainPane.add(logBox, 2, 0, 1, 4);
+
+        // Set alignment for specific components
+        GridPane.setHalignment(experienceLabel, HPos.RIGHT);
+        GridPane.setHalignment(experienceField, HPos.LEFT);
+        GridPane.setHalignment(timeLabel, HPos.CENTER);
+        GridPane.setHalignment(buttonBox, HPos.CENTER);
+        GridPane.setHalignment(railPane, HPos.CENTER);
+        GridPane.setHalignment(logBox, HPos.CENTER);
+
+        Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
         stage.show();
+
+        // Ensure the rail is drawn when the Phase 2 page is shown
+        railPane.repaint();
+
+        movingObjects = new CopyOnWriteArrayList<>();
+
+        backgroundImage = new Image("file:packaging-closing-machine.jpg");
+        sorterImage = new Image("file:sorter.png");
+        distributorImage = new Image("file:distbuter.png");
+        plasticImage = new Image("file:PLASTIC.png");
+        metalImage = new Image("file:METEL.png");
+        glassImage = new Image("file:GLASS.png");
+        paperImage = new Image("file:PAPER.png");
+        errorImage = new Image("file:error.png");
+    }
+
+    private void startAutomationSimulation() {
+        List<Recyclableitem> items = Recyclableitem.createList(numObjects);
+        Employee automation_sort = new Sensor(1, 0.0, "lazer");
+        Employee automation_distribute = new Sensor(2, 0.0, "piston");
+        railPane.setMovingObjects(movingObjects);
+
+        new Thread(() -> {
+            int startX = -50;
+            for (Recyclableitem item : items) {
+                movingObjects.add(new MovingObject(item, startX, automation_sort, automation_distribute));
+                railPane.repaint();
+                startX -= 35;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        startTime = System.currentTimeMillis();
+        clockTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                long currentTime = System.currentTimeMillis();
+                long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                int hours = (int) (elapsedTime / 3600000);
+                int minutes = (int) (elapsedTime / 60000) % 60;
+                int seconds = (int) (elapsedTime / 1000) % 60;
+                timeLabel.setText(String.format("Time: %02d:%02d:%02d", hours, minutes, seconds));
+                railPane.repaint();
+            }
+        };
+        clockTimer.start();
     }
 
     private void setTimeMultiplier(int multiplier) {
@@ -429,6 +597,7 @@ public class GUIMain extends Application {
             this.distributed = false;
             this.sorterEmployee = sorterEmployee;
             this.distributorEmployee = distributorEmployee;
+
         }
 
         private Image getImageForType(String itemType) {
@@ -450,6 +619,7 @@ public class GUIMain extends Application {
 
         public void draw(GraphicsContext gc, int middleY, int mainBeltEnd, int sorterX, int distributorX, int[] lanePositions) {
             // Check if the object is at the sorter position and not already sorting
+            
             if (!item.isDone_sorting() && x >= sorterX - 10 && x <= sorterX + 10 && !isSorting) {
                 isSorting = true; // Set the sorting flag to true
                 new Thread(() -> {
