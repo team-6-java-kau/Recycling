@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
@@ -17,6 +18,10 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
+import javafx.application.Platform;
 
 
 
@@ -76,24 +81,21 @@ public class GUIMain extends Application {
 
         mainBackgroundImage = new Image("file:main-background.jpg");
 
-        Pane mainPane = new Pane();
+        GridPane mainPane = new GridPane();
+        mainPane.setAlignment(Pos.CENTER);
+        mainPane.setPadding(new Insets(20));
+        mainPane.setHgap(10);
+        mainPane.setVgap(10);
         BackgroundImage backgroundImage = new BackgroundImage(mainBackgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         mainPane.setBackground(new Background(backgroundImage));
 
-        VBox inputBox = new VBox(10);
-        inputBox.setAlignment(Pos.CENTER);
-        inputBox.setPadding(new Insets(20));
         Label numObjectsLabel = new Label("Number of Objects:");
         numObjectsField = new TextField();
-        inputBox.getChildren().addAll(numObjectsLabel, numObjectsField);
 
-        HBox buttonBox = new HBox(30);
-        buttonBox.setAlignment(Pos.CENTER);
         Button phase1Button = new Button("Phase 1");
         Button phase2Button = new Button("Phase 2");
         phase1Button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         phase2Button.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
-        buttonBox.getChildren().addAll(phase1Button, phase2Button);
 
         phase1Button.setOnAction(e -> {
             String numObjectsText = numObjectsField.getText().trim();
@@ -116,14 +118,22 @@ public class GUIMain extends Application {
 
         phase2Button.setOnAction(e -> startPhase2());
 
-        VBox mainBox = new VBox(20);
-        mainBox.setAlignment(Pos.CENTER);
-        mainBox.getChildren().addAll(inputBox, buttonBox);
+        // Add components to the grid with specific positions
+        mainPane.add(numObjectsLabel, 0, 0);
+        mainPane.add(numObjectsField, 1, 0);
+        mainPane.add(phase1Button, 0, 1);
+        mainPane.add(phase2Button, 1, 1);
 
-        mainPane.getChildren().add(mainBox);
+        // Set alignment for specific components
+        GridPane.setHalignment(numObjectsLabel, HPos.RIGHT);
+        GridPane.setHalignment(numObjectsField, HPos.LEFT);
+        GridPane.setHalignment(phase1Button, HPos.CENTER);
+        GridPane.setHalignment(phase2Button, HPos.CENTER);
 
         Scene scene = new Scene(mainPane, 400, 300);
         stage.setScene(scene);
+        stage.setResizable(false); // Make the window fixed size
+        stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
         stage.show();
     }
 
@@ -132,18 +142,18 @@ public class GUIMain extends Application {
         stage = new Stage();
         stage.setTitle("Simulation");
 
-        Pane mainPane = new Pane();
+        GridPane mainPane = new GridPane();
+        mainPane.setAlignment(Pos.CENTER);
+        mainPane.setPadding(new Insets(20));
+        mainPane.setHgap(10);
+        mainPane.setVgap(10);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        VBox inputBox = new VBox(10);
-        inputBox.setAlignment(Pos.CENTER);
-        inputBox.setPadding(new Insets(20));
         Label experienceLabel = new Label("Experience:");
+        experienceLabel.setTextFill(Color.WHITE);
         experienceField = new TextField();
-        inputBox.getChildren().addAll(experienceLabel, experienceField);
-
         timeLabel = new Label("Time: 00:00:00");
-        inputBox.getChildren().add(timeLabel);
+        timeLabel.setTextFill(Color.WHITE);
 
         stopButton = new Button("Pause");
         speedUp1xButton = new Button("Play");
@@ -168,27 +178,14 @@ public class GUIMain extends Application {
         speedUp4xButton.setDisable(true);
         speedUp1xButton.setDisable(true);
 
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, resetTirednessButton);
-
-        stopButton.setOnAction(e -> setTimeMultiplier(0));
-        speedUp2xButton.setOnAction(e -> setTimeMultiplier(2));
-        speedUp4xButton.setOnAction(e -> setTimeMultiplier(4));
-        speedUp1xButton.setOnAction(e -> setTimeMultiplier(1));
-
         Button startButton = new Button("Start");
-        buttonBox.getChildren().add(startButton);
-
         returnButton = new Button("Return");
         returnButton.setDisable(true);
         returnButton.setOnAction(e -> returnToMainPage());
-        buttonBox.getChildren().add(returnButton);
 
         changeExperienceButton = new Button("Change Experience");
         changeExperienceButton.setDisable(true);
         changeExperienceButton.setOnAction(e -> changeExperience());
-        buttonBox.getChildren().add(changeExperienceButton);
 
         startButton.setOnAction(e -> {
             startButton.setDisable(true);
@@ -224,28 +221,70 @@ public class GUIMain extends Application {
             startSimulation();
         });
 
-        railPane = new RailPane();
-        mainPane.getChildren().add(railPane);
+        // Define event handlers for speed-up buttons
+        speedUp1xButton.setOnAction(e -> {
+            setTimeMultiplier(1);
+            resumeSimulation();
+        });
+        speedUp2xButton.setOnAction(e -> {
+            setTimeMultiplier(2);
+            resumeSimulation();
+        });
+        speedUp4xButton.setOnAction(e -> {
+            setTimeMultiplier(4);
+            resumeSimulation();
+        });
+        stopButton.setOnAction(e -> {
+            setTimeMultiplier(0);
+            pauseSimulation();
+        });
 
+        railPane = new RailPane();
         sortingLogArea = new TextArea();
         sortingLogArea.setEditable(false);
-        sortingLogArea.setPrefHeight(450);
+        sortingLogArea.setPrefHeight(300);
+        sortingLogArea.setPrefWidth(300);
 
         distributingLogArea = new TextArea();
         distributingLogArea.setEditable(false);
-        distributingLogArea.setPrefHeight(450);
+        distributingLogArea.setPrefHeight(300);
+        distributingLogArea.setPrefWidth(300);
+
+        // Add components to the grid with specific positions
+        mainPane.add(experienceLabel, 0, 0);
+        mainPane.add(experienceField, 1, 0);
+        mainPane.add(timeLabel, 0, 1, 2, 1);
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, resetTirednessButton, startButton, returnButton, changeExperienceButton);
+        mainPane.add(buttonBox, 0, 2, 2, 1);
+
+        mainPane.add(railPane, 0, 3, 2, 1);
 
         VBox logBox = new VBox(10);
-        logBox.getChildren().addAll(new Label("Sorting Log:"), sortingLogArea, new Label("Distributing Log:"), distributingLogArea);
+        Label sortingLogLabel = new Label("Sorting Log:");
+        sortingLogLabel.setTextFill(Color.WHITE);
+        Label distributingLogLabel = new Label("Distributing Log:");
+        distributingLogLabel.setTextFill(Color.WHITE);
+        logBox.getChildren().addAll(sortingLogLabel, sortingLogArea, distributingLogLabel, distributingLogArea);
+        mainPane.add(logBox, 2, 0, 1, 4);
 
-        HBox mainBox = new HBox(10);
-        mainBox.getChildren().addAll(inputBox, buttonBox, logBox);
+        // Set alignment for specific components
+        GridPane.setHalignment(experienceLabel, HPos.RIGHT);
+        GridPane.setHalignment(experienceField, HPos.LEFT);
+        GridPane.setHalignment(timeLabel, HPos.CENTER);
+        GridPane.setHalignment(buttonBox, HPos.CENTER);
+        GridPane.setHalignment(railPane, HPos.CENTER);
+        GridPane.setHalignment(logBox, HPos.CENTER);
 
-        mainPane.getChildren().add(mainBox);
-
-        Scene scene = new Scene(mainPane, 1300, 900);
+        Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
+        stage.setResizable(false); // Make the window fixed size
+        stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
         stage.show();
+
+        // Ensure the rail is drawn when the Phase 1 page is shown
+        railPane.repaint();
 
         movingObjects = new CopyOnWriteArrayList<>();
 
@@ -272,8 +311,10 @@ public class GUIMain extends Application {
         Label label = new Label("Phase 2 Page");
         label.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(new StackPane(label), 1300, 900);
+        Scene scene = new Scene(new StackPane(label), 1600, 900);
         stage.setScene(scene);
+        stage.setResizable(false); // Make the window fixed size
+        stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
         stage.show();
     }
 
@@ -282,6 +323,18 @@ public class GUIMain extends Application {
         elapsedTimeBefore += (currentTime - startTime) * timeMultiplier;
         startTime = currentTime;
         this.timeMultiplier = multiplier;
+    }
+
+    private void pauseSimulation() {
+        if (clockTimer != null) {
+            clockTimer.stop();
+        }
+    }
+
+    private void resumeSimulation() {
+        if (clockTimer != null) {
+            clockTimer.start();
+        }
     }
 
     private void startSimulation() {
@@ -517,21 +570,25 @@ public class GUIMain extends Application {
                     // Make the object disappear after 10 seconds
                     new Thread(() -> {
                         try {
-                            Thread.sleep(10000); // Wait for 10 seconds
-                            if (allItemsDistributed()) {
-                                pahse1_done = true;
-                                clockTimer.stop(); // Stop the timer when all objects are distributed
-                                javafx.application.Platform.runLater(() -> {
-                                    showAlert(AlertType.INFORMATION, "Simulation Status", "Simulation completed!");
+                            Thread.sleep(100); 
+                            javafx.application.Platform.runLater(() -> {
+                                movingObjects.remove(this); // Remove the object from the list
+                                railPane.repaint(); // Repaint the rail panel
+                                if (allItemsDistributed() && !pahse1_done) {
+                                    pahse1_done = true;
+                                    clockTimer.stop(); // Stop the timer when all objects are distributed
+                                    Alert alert = new Alert(AlertType.INFORMATION);
+                                    alert.setTitle("Simulation Status");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText("Simulation completed!");
+                                    alert.showAndWait(); // Wait for the user to press OK
                                     stopButton.setDisable(true); // Disable the stop button
                                     returnButton.setDisable(false); // Enable the return button
-                                });
-                            }
+                                }
+                            });
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        movingObjects.remove(this); // Remove the object from the list
-                        javafx.application.Platform.runLater(railPane::repaint); // Repaint the rail panel
                     }).start();
                 }
             }
@@ -540,17 +597,17 @@ public class GUIMain extends Application {
         public void updatePosition() {
             while (true) {
                 if (!item.isDone_sorting() && !isSorting) {
-                    x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
+                    x += 1 * timeMultiplier; // Move right (adjusted by timeMultiplier)
                     break;
                 }
 
                 if (item.isDone_sorting() && !item.isdone_distribute() && !isDistributing) {
-                    x += 5 * timeMultiplier; // Move right (adjusted by timeMultiplier)
+                    x += 1 * timeMultiplier; // Move right (adjusted by timeMultiplier)
                     break;
                 }
 
                 if (item.isdone_distribute()) {
-                    x += 5 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
+                    x += 1 * timeMultiplier; // Move right in the lane (adjusted by timeMultiplier)
                     break;
                 }
 
@@ -614,7 +671,8 @@ public class GUIMain extends Application {
 
             // Draw the sorter employee
             gc.drawImage(sorterImage, sorterX - 30, middleY - 60, 60, 120); // Adjusted sorter image size
-            gc.setFill(Color.BLACK);
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
             gc.fillText("Sorter Employee", sorterX - 30, middleY - 70); // Sorter label
             gc.fillText("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
 
@@ -628,7 +686,7 @@ public class GUIMain extends Application {
 
             // Draw the distributor employee in front of the main path
             gc.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120);
-            gc.setFill(Color.BLACK);
+            gc.setFill(Color.WHITE);
             gc.fillText("Distributor Employee", distributorX + 50, middleY - 0); // Distributor label
             gc.fillText("Distributed: " + distributorCount, distributorX + 50, middleY - 20); // Distributor counter
 
@@ -664,40 +722,38 @@ public class GUIMain extends Application {
             gc.fillRect(mainBeltEnd + 160, middleY + 40, 30, 20); // Glass basket
             gc.fillRect(mainBeltEnd + 160, middleY + 80, 30, 20); // Paper basket
 
-            gc.setFill(Color.BLACK);
-            gc.setFont(new Font("Times New Roman", 12));
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
             gc.fillText("Metal: " + metalCount, mainBeltEnd + 200, middleY - 110);
             gc.fillText("Plastic: " + plasticCount, mainBeltEnd + 200, middleY - 70);
             gc.fillText("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
             gc.fillText("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
+            
+            
 
-            // Draw the additional information box
-            gc.setFill(Color.WHITE);
-            gc.fillRect(sorterX - 150, middleY - 350, 400, 190); // Square for additional information
+            gc.fillText("Number of Objects Done: " + distributorCount, sorterX - 420, middleY - 330);
+            gc.fillText("Number of Errors: " + totalErrors, sorterX - 420, middleY - 310);
+            gc.fillText("Tons Done for Each Material:", sorterX - 420, middleY - 290);
+            gc.fillText("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons", sorterX - 420, middleY - 270);
+            gc.fillText("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons", sorterX - 420, middleY - 250);
+            gc.fillText("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons", sorterX - 420, middleY - 230);
+            gc.fillText("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons", sorterX - 420, middleY - 210);
 
-            gc.setStroke(Color.BLACK);
-            gc.strokeRect(sorterX - 150, middleY - 350, 400, 190); // Border for additional information
+            // Calculate and display hours of working based on total items sorted and distributed
 
-            gc.fillText("Number of Objects Done: " + distributorCount, sorterX - 140, middleY - 330);
-            gc.fillText("Number of Errors: " + totalErrors, sorterX - 140, middleY - 310);
-            gc.fillText("Tons Done for Each Material:", sorterX - 140, middleY - 290);
-            gc.fillText("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons", sorterX - 140, middleY - 270);
-            gc.fillText("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons", sorterX - 140, middleY - 250);
-            gc.fillText("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons", sorterX - 140, middleY - 230);
-            gc.fillText("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons", sorterX - 140, middleY - 210);
 
             // Calculate and display total sorting time
             long totalSortingSeconds = totalSortingTime / 1000;
             int sortingHours = (int) (totalSortingSeconds / 3600);
             int sortingMinutes = (int) (totalSortingSeconds / 60) % 60;
             int sortingSeconds = (int) (totalSortingSeconds % 60);
-            gc.fillText(String.format("Total Sorting Time: %02d:%02d:%02d", sortingHours, sortingMinutes, sortingSeconds), sorterX - 140, middleY - 190);
+            gc.fillText(String.format("Total Sorting Time: %02d:%02d:%02d", sortingHours, sortingMinutes, sortingSeconds), sorterX - 420, middleY - 190);
 
             // Calculate and display average sorting time
             double averageSortingTime = totalSortedItems > 0 ? (double) totalSortingTime / totalSortedItems / 1000 : 0;
             int avgSortingMinutes = (int) (averageSortingTime / 60);
             int avgSortingSeconds = (int) (averageSortingTime % 60);
-            gc.fillText(String.format("Average Sorting Time: %02d:%02d", avgSortingMinutes, avgSortingSeconds), sorterX - 140, middleY - 170);
+            gc.fillText(String.format("Average Sorting Time: %02d:%02d", avgSortingMinutes, avgSortingSeconds), sorterX - 420, middleY - 170);
 
             // Draw the moving objects
             for (MovingObject obj : movingObjects) {
