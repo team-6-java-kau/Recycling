@@ -402,11 +402,53 @@ public class GUIMain extends Application {
         logBox.getChildren().addAll(sortingLogLabel, sortingLogArea, distributingLogLabel, distributingLogArea);
         mainPane.add(logBox, 2, 0, 1, 3);
 
+        // Add Phase 1 information to the left in the middle
+        VBox phase1InfoBox = new VBox(10);
+        phase1InfoBox.setAlignment(Pos.CENTER_LEFT);
+        phase1InfoBox.setPadding(new Insets(10));
+        phase1InfoBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
+        Label phase1InfoLabel = new Label("Phase 1 Information:");
+        phase1InfoLabel.setTextFill(Color.WHITE);
+        phase1InfoBox.getChildren().addAll(
+            phase1InfoLabel,
+            new Label("Number of Objects Done: " + distributorCount),
+            new Label("Number of Errors: " + totalErrors),
+            new Label("Tons Done for Each Material:"),
+            new Label("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons"),
+            new Label("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons"),
+            new Label("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons"),
+            new Label("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons")
+        );
+        phase1InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
+        mainPane.add(phase1InfoBox, 0, 3, 2, 1);
+
+        // Add Phase 2 information to the right in the middle
+        VBox phase2InfoBox = new VBox(10);
+        phase2InfoBox.setAlignment(Pos.CENTER_LEFT);
+        phase2InfoBox.setPadding(new Insets(10));
+        phase2InfoBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
+        Label phase2InfoLabel = new Label("Phase 2 Information:");
+        phase2InfoLabel.setTextFill(Color.WHITE);
+        phase2InfoBox.getChildren().addAll(
+            phase2InfoLabel,
+            new Label("Number of Objects Done: " + distributorCount),
+            new Label("Number of Errors: " + totalErrors),
+            new Label("Tons Done for Each Material:"),
+            new Label("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons"),
+            new Label("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons"),
+            new Label("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons"),
+            new Label("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons")
+    
+        );
+        phase2InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
+        mainPane.add(phase2InfoBox, 2, 3, 2, 1);
 
         GridPane.setHalignment(timeLabel, HPos.CENTER);
         GridPane.setHalignment(buttonBox, HPos.CENTER);
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
+        GridPane.setHalignment(phase1InfoBox, HPos.LEFT);
+        GridPane.setHalignment(phase2InfoBox, HPos.RIGHT);
 
         Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
@@ -883,8 +925,6 @@ public class GUIMain extends Application {
             gc.fillText("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
             gc.fillText("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
             
-            
-
             gc.fillText("Number of Objects Done: " + distributorCount, sorterX - 420, middleY - 330);
             gc.fillText("Number of Errors: " + totalErrors, sorterX - 420, middleY - 310);
             gc.fillText("Tons Done for Each Material:", sorterX - 420, middleY - 290);
