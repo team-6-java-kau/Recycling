@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.GridPane;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.application.Platform;
@@ -64,6 +63,7 @@ public class GUIMain extends Application {
     private int totalSortedItems = 0;
     private Image mainBackgroundImage;
     private boolean pahse1_done = false;
+    private boolean pahse2_done = false;
     private Button returnButton;
     private double totalPlasticWeight = 0;
     private double totalMetalWeight = 0;
@@ -74,8 +74,9 @@ public class GUIMain extends Application {
     private Sorter sorter;
     private Distributor distributor;
     private Button resetTirednessButton;
-    private boolean phase1Done = false; // Add a flag to track if Phase 1 is done
     private Button phase2Button; // Declare phase2Button as a class-level variable
+    private boolean phase1_stop = false;
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -239,7 +240,7 @@ public class GUIMain extends Application {
             resumeSimulation();
         });
         speedUp4xButton.setOnAction(e -> {
-            setTimeMultiplier(4);
+            setTimeMultiplier(16);
             resumeSimulation();
         });
         stopButton.setOnAction(e -> {
@@ -338,15 +339,16 @@ public class GUIMain extends Application {
         speedUp1xButton.setDisable(true);
 
         Button startButton = new Button("Start");
-        returnButton = new Button("Return");
+        returnButton = new Button("End");
         returnButton.setDisable(true);
-        returnButton.setOnAction(e -> returnToMainPage());
+        returnButton.setOnAction(e -> Platform.exit());
         startButtonPressed = false;
         startButton.setOnAction(e -> {
             startButton.setDisable(true);
             if (startButtonPressed) {
                 return;
             }
+            phase1_stop = true;
             startButtonPressed = true;
             System.out.println("Start button clicked phase 2");
             stopButton.setDisable(false);
@@ -719,31 +721,46 @@ public class GUIMain extends Application {
                 if (x > mainBeltEnd + 160) { // Use mainBeltEnd + 160 for the lanes
                     x = mainBeltEnd + 150; // Stop at the basket
                     // Make the object disappear after 10 seconds
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(100); 
-                            javafx.application.Platform.runLater(() -> {
-                                movingObjects.remove(this); // Remove the object from the list
-                                railPane.repaint(); // Repaint the rail panel
-                                if (allItemsDistributed() && !pahse1_done) {
-                                    pahse1_done = true;
-                                    clockTimer.stop(); // Stop the timer when all objects are distributed
-                                    Alert alert = new Alert(AlertType.INFORMATION);
-                                    alert.setTitle("Simulation Status");
-                                    alert.setHeaderText(null);
-                                    alert.setContentText("Phase 1 completed! You can now proceed to Phase 2.");
-                                    alert.showAndWait(); // Wait for the user to press OK
-                                    stopButton.setDisable(true); // Disable the stop button
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(100);
+                        javafx.application.Platform.runLater(() -> {
+                            movingObjects.remove(MovingObject.this); // Remove the object from the list
+                            railPane.repaint(); // Repaint the rail panel
+                            if (allItemsDistributed() && (!pahse2_done && phase1_stop)) {
+                                pahse2_done = true;
+                                clockTimer.stop(); // Stop the timer when all objects are distributed
+                                Alert alert = new Alert(AlertType.INFORMATION);
+                                alert.setTitle("Simulation Status");
+                                alert.setHeaderText(null);
+                                alert.setContentText("Phase 2 completed! You can now return to the main page.");
+                                alert.showAndWait(); // Wait for the user to press OK
+                                stopButton.setDisable(true); // Disable the stop button
+                                returnButton.setDisable(false); // Enable the return button
+                                Platform.runLater(() -> {
                                     returnButton.setDisable(false); // Enable the return button
-                                    Platform.runLater(() -> {
-                                        phase2Button.setDisable(false); // Enable Phase 2 button
-                                    });
-                                }
-                            });
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
+                                });
+                            }
+                            if (allItemsDistributed() && !pahse1_done) {
+                                pahse1_done = true;
+                                clockTimer.stop(); // Stop the timer when all objects are distributed
+                                Alert alert = new Alert(AlertType.INFORMATION);
+                                alert.setTitle("Simulation Status");
+                                alert.setHeaderText(null);
+                                alert.setContentText("Phase 1 completed! You can now proceed to Phase 2.");
+                                alert.showAndWait(); // Wait for the user to press OK
+                                stopButton.setDisable(true); // Disable the stop button
+                                returnButton.setDisable(false); // Enable the return button
+                                Platform.runLater(() -> {
+                                    phase2Button.setDisable(false); // Enable Phase 2 button
+                                });
+                            }
+                            
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
                 }
             }
         }
