@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "GUIMain",
+            "request": "launch",
+            "mainClass": "GUIMain",
+            "projectName": "Recycling_11f67ce"
+        },
+        {
+            "type": "java",
             "name": "RailPanel",
             "request": "launch",
             "mainClass": "RailPanel",
