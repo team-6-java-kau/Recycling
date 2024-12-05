@@ -6,62 +6,31 @@
             "name": "GUIMain",
             "request": "launch",
             "mainClass": "GUIMain",
-            "projectName": "Recycling_11f67ce"
+            "projectName": "Recycling_11f67ce",
+            "vmArgs": "--module-path \"c:/Program Files/Java/javafx-sdk-23.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
-            "name": "RailPanel",
+            "name": "BasicJavaFXApp",
             "request": "launch",
-            "mainClass": "RailPanel",
-            "projectName": "Recycling_48471579",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "GUIMain",
-            "request": "launch",
-            "mainClass": "GUIMain",
-            "projectName": "Recycling_37cb3877",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "Recycling_2e9543da",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
+            "mainClass": "BasicJavaFXApp",
+            "projectName": "Recycling_11f67ce",
+            "vmArgs": "--module-path \"c:/Program Files/Java/javafx-sdk-23.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
             "name": "GUIMain",
             "request": "launch",
             "mainClass": "GUIMain",
-            "projectName": "Recycling_2e9543da",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "GUIMain",
-            "request": "launch",
-            "mainClass": "GUIMain",
-            "projectName": "Recycling_48471579",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
+            "projectName": "Recycling",
+            "vmArgs": "--module-path \"c:/Program Files/Java/javafx-sdk-23.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
-        },
-        {
-            "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "Recycling_48471579",
-            "vmArgs": "--module-path \"c:/Program Files/Eclipse Adoptium/javafx-sdk-21.0.5/lib\" --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path \"c:/Program Files/Java/javafx-sdk-23.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }

@@ -285,7 +285,7 @@ public class GUIMain extends Application {
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
 
-        Scene scene = new Scene(mainPane, 1600, 900);
+        Scene scene = new Scene(mainPane, 1600, 800);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
@@ -408,7 +408,7 @@ public class GUIMain extends Application {
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
 
-        Scene scene = new Scene(mainPane, 1600, 900);
+        Scene scene = new Scene(mainPane, 1600, 800);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
@@ -787,7 +787,7 @@ public class GUIMain extends Application {
         RailPane() {
             this.movingObjects = new ArrayList<>();
             this.lanePositions = new int[4];
-            this.canvas = new Canvas(1300, 900); // Set canvas size
+            this.canvas = new Canvas(1300, 800); // Set canvas size
             getChildren().add(canvas);
         }
 
