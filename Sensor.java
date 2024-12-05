@@ -24,7 +24,7 @@ public class Sensor extends Employee {
 
     @Override
     public double calculateSortTime(Recyclableitem recyclable) {
-        double sortTime = 0.0;
+        double sortTime = 0.1;
         recyclable.set_time_to_sort(sortTime);
         return sortTime;
     }
@@ -32,14 +32,14 @@ public class Sensor extends Employee {
     @Override
     public boolean sort(Recyclableitem recyclable) {
         double sortTime = calculateSortTime(recyclable);
-        setWorkingHours(getWorkingHours() + sortTime);
+        setWorkingHours(sortTime);
         incrementItemsDone();
         return true; // Sensors do not produce errors
     }
 
     @Override
     public double calculateDistributeTime(Recyclableitem item) {
-        double distributeTime = 0.0;
+        double distributeTime = 0.1;
         item.set_time_to_distribute(distributeTime);
         return distributeTime;
     }
@@ -47,7 +47,7 @@ public class Sensor extends Employee {
     @Override
     public void distributeItem(Recyclableitem item) {
         double distributeTime = calculateDistributeTime(item);
-        setWorkingHours(getWorkingHours() + distributeTime);
+        setWorkingHours(distributeTime);
         incrementItemsDone();
     }
 }

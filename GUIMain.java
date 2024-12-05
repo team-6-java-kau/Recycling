@@ -30,6 +30,7 @@ public class GUIMain extends Application {
     private TextField experienceField;
     private TextField numObjectsField;
     private int numObjects;
+    private int numItemsSame;
     private RailPane railPane;
     private List<MovingObject> movingObjects;
     private AnimationTimer clockTimer;
@@ -73,6 +74,8 @@ public class GUIMain extends Application {
     private Sorter sorter;
     private Distributor distributor;
     private Button resetTirednessButton;
+    private boolean phase1Done = false; // Add a flag to track if Phase 1 is done
+    private Button phase2Button; // Declare phase2Button as a class-level variable
 
     @Override
     public void start(Stage primaryStage) {
@@ -93,9 +96,10 @@ public class GUIMain extends Application {
         numObjectsField = new TextField();
 
         Button phase1Button = new Button("Phase 1");
-        Button phase2Button = new Button("Phase 2");
+        phase2Button = new Button("Phase 2"); // Initialize phase2Button
         phase1Button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         phase2Button.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+        phase2Button.setDisable(true); // Disable Phase 2 button initially
 
         phase1Button.setOnAction(e -> {
             String numObjectsText = numObjectsField.getText().trim();
@@ -182,7 +186,10 @@ public class GUIMain extends Application {
         Button startButton = new Button("Start");
         returnButton = new Button("Return");
         returnButton.setDisable(true);
-        returnButton.setOnAction(e -> returnToMainPage());
+        returnButton.setOnAction(e -> {
+            returnToMainPage();
+            phase2Button.setDisable(false); // Enable Phase 2 button
+        });
 
         changeExperienceButton = new Button("Change Experience");
         changeExperienceButton.setDisable(true);
@@ -316,9 +323,7 @@ public class GUIMain extends Application {
         mainPane.setVgap(10);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Label experienceLabel = new Label("Experience:");
-        experienceLabel.setTextFill(Color.WHITE);
-        experienceField = new TextField();
+
         timeLabel = new Label("Time: 00:00:00");
         timeLabel.setTextFill(Color.WHITE);
 
@@ -326,8 +331,6 @@ public class GUIMain extends Application {
         speedUp1xButton = new Button("Play");
         speedUp2xButton = new Button("x2");
         speedUp4xButton = new Button("x4");
-        resetTirednessButton = new Button("Reset Tiredness");
-        resetTirednessButton.setDisable(true);
 
         stopButton.setDisable(true);
         speedUp2xButton.setDisable(true);
@@ -338,39 +341,20 @@ public class GUIMain extends Application {
         returnButton = new Button("Return");
         returnButton.setDisable(true);
         returnButton.setOnAction(e -> returnToMainPage());
-
+        startButtonPressed = false;
         startButton.setOnAction(e -> {
             startButton.setDisable(true);
             if (startButtonPressed) {
                 return;
             }
             startButtonPressed = true;
-            System.out.println("Start button clicked");
-            String experienceText = experienceField.getText().trim();
-            if (experienceText.isEmpty()) {
-                showAlert(AlertType.WARNING, "Input Required", "Please enter Experience value");
-                startButtonPressed = false;
-                startButton.setDisable(false);
-                return;
-            }
-            try {
-                int experienceInput = Integer.parseInt(experienceText);
-                if (experienceInput < 0 || experienceInput > 25) {
-                    showAlert(AlertType.WARNING, "Invalid Input", "Experience must be between 0 and 25 years");
-                    startButtonPressed = false;
-                    startButton.setDisable(false);
-                    return;
-                }
-            } catch (NumberFormatException ex) {
-                showAlert(AlertType.WARNING, "Invalid Input", "Please enter a valid number for Experience");
-                startButtonPressed = false;
-                return;
-            }
+            System.out.println("Start button clicked phase 2");
             stopButton.setDisable(false);
             speedUp2xButton.setDisable(false);
             speedUp4xButton.setDisable(false);
             speedUp1xButton.setDisable(false);
             startAutomationSimulation();
+
         });
 
         // Define event handlers for speed-up buttons
@@ -402,16 +386,13 @@ public class GUIMain extends Application {
         distributingLogArea.setPrefHeight(300);
         distributingLogArea.setPrefWidth(300);
 
-        // Add components to the grid with specific positions
-        mainPane.add(experienceLabel, 0, 0);
-        mainPane.add(experienceField, 1, 0);
-        mainPane.add(timeLabel, 0, 1, 2, 1);
+        mainPane.add(timeLabel, 0, 0, 2, 1);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, resetTirednessButton, startButton, returnButton);
-        mainPane.add(buttonBox, 0, 2, 2, 1);
+        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, startButton, returnButton);
+        mainPane.add(buttonBox, 0, 1, 2, 1);
 
-        mainPane.add(railPane, 0, 3, 2, 1);
+        mainPane.add(railPane, 0, 2, 2, 1);
 
         VBox logBox = new VBox(10);
         Label sortingLogLabel = new Label("Sorting Log:");
@@ -419,11 +400,9 @@ public class GUIMain extends Application {
         Label distributingLogLabel = new Label("Distributing Log:");
         distributingLogLabel.setTextFill(Color.WHITE);
         logBox.getChildren().addAll(sortingLogLabel, sortingLogArea, distributingLogLabel, distributingLogArea);
-        mainPane.add(logBox, 2, 0, 1, 4);
+        mainPane.add(logBox, 2, 0, 1, 3);
 
-        // Set alignment for specific components
-        GridPane.setHalignment(experienceLabel, HPos.RIGHT);
-        GridPane.setHalignment(experienceField, HPos.LEFT);
+
         GridPane.setHalignment(timeLabel, HPos.CENTER);
         GridPane.setHalignment(buttonBox, HPos.CENTER);
         GridPane.setHalignment(railPane, HPos.CENTER);
@@ -451,6 +430,8 @@ public class GUIMain extends Application {
     }
 
     private void startAutomationSimulation() {
+        System.out.println(numObjects);
+        System.out.println(numItemsSame);
         List<Recyclableitem> items = Recyclableitem.createList(numObjects);
         Employee automation_sort = new Sensor(1, 0.0, "lazer");
         Employee automation_distribute = new Sensor(2, 0.0, "piston");
@@ -750,10 +731,13 @@ public class GUIMain extends Application {
                                     Alert alert = new Alert(AlertType.INFORMATION);
                                     alert.setTitle("Simulation Status");
                                     alert.setHeaderText(null);
-                                    alert.setContentText("Simulation completed!");
+                                    alert.setContentText("Phase 1 completed! You can now proceed to Phase 2.");
                                     alert.showAndWait(); // Wait for the user to press OK
                                     stopButton.setDisable(true); // Disable the stop button
                                     returnButton.setDisable(false); // Enable the return button
+                                    Platform.runLater(() -> {
+                                        phase2Button.setDisable(false); // Enable Phase 2 button
+                                    });
                                 }
                             });
                         } catch (InterruptedException e) {
