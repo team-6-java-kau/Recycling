@@ -420,8 +420,8 @@ public class GUIMain extends Application {
         movingObjects = new CopyOnWriteArrayList<>();
 
         backgroundImage = new Image("file:packaging-closing-machine.jpg");
-        sorterImage = new Image("file:sorter.png");
-        distributorImage = new Image("file:distbuter.png");
+        sorterImage = new Image("file:soreterSensor.png");
+        distributorImage = new Image("file:distributionSensor.png");
         plasticImage = new Image("file:PLASTIC.png");
         metalImage = new Image("file:METEL.png");
         glassImage = new Image("file:GLASS.png");
