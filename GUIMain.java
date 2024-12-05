@@ -76,6 +76,13 @@ public class GUIMain extends Application {
     private Button resetTirednessButton;
     private boolean phase1Done = false; // Add a flag to track if Phase 1 is done
     private Button phase2Button; // Declare phase2Button as a class-level variable
+    private VBox phase2InfoBox; // Declare phase2InfoBox as a class-level variable
+    private int phase2DistributorCount = 0;
+    private int phase2TotalErrors = 0;
+    private double phase2TotalPlasticWeight = 0;
+    private double phase2TotalMetalWeight = 0;
+    private double phase2TotalGlassWeight = 0;
+    private double phase2TotalPaperWeight = 0;
 
     @Override
     public void start(Stage primaryStage) {
@@ -422,8 +429,15 @@ public class GUIMain extends Application {
         phase1InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
         mainPane.add(phase1InfoBox, 0, 3, 2, 1);
 
-        // Add Phase 2 information to the right in the middle
-        VBox phase2InfoBox = new VBox(10);
+        // Initialize Phase 2 information to 0
+        phase2DistributorCount = 0;
+        phase2TotalErrors = 0;
+        phase2TotalPlasticWeight = 0;
+        phase2TotalMetalWeight = 0;
+        phase2TotalGlassWeight = 0;
+        phase2TotalPaperWeight = 0;
+
+        phase2InfoBox = new VBox(10);
         phase2InfoBox.setAlignment(Pos.CENTER_LEFT);
         phase2InfoBox.setPadding(new Insets(10));
         phase2InfoBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -431,14 +445,13 @@ public class GUIMain extends Application {
         phase2InfoLabel.setTextFill(Color.WHITE);
         phase2InfoBox.getChildren().addAll(
             phase2InfoLabel,
-            new Label("Number of Objects Done: " + distributorCount),
-            new Label("Number of Errors: " + totalErrors),
+            new Label("Number of Objects Done: " + phase2DistributorCount),
+            new Label("Number of Errors: " + phase2TotalErrors),
             new Label("Tons Done for Each Material:"),
-            new Label("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons"),
-            new Label("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons"),
-            new Label("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons"),
-            new Label("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons")
-    
+            new Label("Plastic: " + String.format("%.5f", phase2TotalPlasticWeight / 1000) + " tons"),
+            new Label("Metal: ".format("%.5f", phase2TotalMetalWeight / 1000) + " tons"),
+            new Label("Glass: " + String.format("%.5f", phase2TotalGlassWeight / 1000) + " tons"),
+            new Label("Paper: " + String.format("%.5f", phase2TotalPaperWeight / 1000) + " tons")
         );
         phase2InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
         mainPane.add(phase2InfoBox, 2, 3, 2, 1);
@@ -671,7 +684,39 @@ public class GUIMain extends Application {
                         int minutes = (int) (elapsedTime / 60000) % 60;
                         int seconds = (int) (elapsedTime / 1000) % 60;
                         sortingLogArea.appendText("Item sorted\nItem: " + item.getItemType() + "\nTime: " + String.format("%02d:%02d:%02d\n", hours, minutes, seconds));
-                    }); // Print sorted message
+                        
+                        // Update Phase 2 information
+                        phase2DistributorCount++;
+                        if (item.getsortingError()) {
+                            phase2TotalErrors++;
+                        }
+                        switch (item.getItemType()) {
+                            case "Metal":
+                                phase2TotalMetalWeight += item.getItemWeight();
+                                break;
+                            case "Plastic":
+                                phase2TotalPlasticWeight += item.getItemWeight();
+                                break;
+                            case "Glass":
+                                phase2TotalGlassWeight += item.getItemWeight();
+                                break;
+                            case "Paper":
+                                phase2TotalPaperWeight += item.getItemWeight();
+                                break;
+                        }
+                        phase2InfoBox.getChildren().clear();
+                        phase2InfoBox.getChildren().addAll(
+                            new Label("Phase 2 Information:"),
+                            new Label("Number of Objects Done: " + phase2DistributorCount),
+                            new Label("Number of Errors: " + phase2TotalErrors),
+                            new Label("Tons Done for Each Material:"),
+                            new Label("Plastic: " + String.format("%.5f", phase2TotalPlasticWeight / 1000) + " tons"),
+                            new Label("Metal: " + String.format("%.5f", phase2TotalMetalWeight / 1000) + " tons"),
+                            new Label("Glass: " + String.format("%.5f", phase2TotalGlassWeight / 1000) + " tons"),
+                            new Label("Paper: " + String.format("%.5f", phase2TotalPaperWeight / 1000) + " tons")
+                        );
+                        phase2InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
+                    });
                 }).start();
             }
 
@@ -779,6 +824,43 @@ public class GUIMain extends Application {
                                     returnButton.setDisable(false); // Enable the return button
                                     Platform.runLater(() -> {
                                         phase2Button.setDisable(false); // Enable Phase 2 button
+                                    });
+                                } else if (allItemsDistributed() && pahse1_done) {
+                                    // Update Phase 2 information
+                                    Platform.runLater(() -> {
+                                        if (!distributed) {
+                                            phase2DistributorCount++;
+                                            distributed = true;
+                                        }
+                                        if (item.getsortingError()) {
+                                            phase2TotalErrors++;
+                                        }
+                                        switch (item.getItemType()) {
+                                            case "Metal":
+                                                phase2TotalMetalWeight += item.getItemWeight();
+                                                break;
+                                            case "Plastic":
+                                                phase2TotalPlasticWeight += item.getItemWeight();
+                                                break;
+                                            case "Glass":
+                                                phase2TotalGlassWeight += item.getItemWeight();
+                                                break;
+                                            case "Paper":
+                                                phase2TotalPaperWeight += item.getItemWeight();
+                                                break;
+                                        }
+                                        phase2InfoBox.getChildren().clear();
+                                        phase2InfoBox.getChildren().addAll(
+                                            new Label("Phase 2 Information:"),
+                                            new Label("Number of Objects Done: " + phase2DistributorCount),
+                                            new Label("Number of Errors: " + phase2TotalErrors),
+                                            new Label("Tons Done for Each Material:"),
+                                            new Label("Plastic: " + String.format("%.5f", phase2TotalPlasticWeight / 1000) + " tons"),
+                                            new Label("Metal: " + String.format("%.5f", phase2TotalMetalWeight / 1000) + " tons"),
+                                            new Label("Glass: " + String.format("%.5f", phase2TotalGlassWeight / 1000) + " tons"),
+                                            new Label("Paper: " + String.format("%.5f", phase2TotalPaperWeight / 1000) + " tons")
+                                        );
+                                        phase2InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
                                     });
                                 }
                             });
