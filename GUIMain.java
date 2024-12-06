@@ -74,6 +74,7 @@ public class GUIMain extends Application {
     private Button resetTirednessButton;
     private Button phase2Button; // Declare phase2Button as a class-level variable
     private boolean phase1_stop = false;
+    private boolean phase1Completed = false; // Add a flag to track if Phase 1 is completed
     private List<Recyclableitem> items;
     private List<Recyclableitem> phase1Items;
     private List<Recyclableitem> phase2Items;
@@ -124,17 +125,24 @@ public class GUIMain extends Application {
 
         phase2Button.setOnAction(e -> startPhase2());
 
-        // Add components to the grid with specific positions
-        mainPane.add(numObjectsLabel, 0, 0);
-        mainPane.add(numObjectsField, 1, 0);
-        mainPane.add(phase1Button, 0, 1);
-        mainPane.add(phase2Button, 1, 1);
+        // Declare numObjectsBox outside the if block
+        HBox numObjectsBox = new HBox(10);
+        if (!phase1Completed) {
+            numObjectsBox.setAlignment(Pos.CENTER);
+            numObjectsBox.getChildren().addAll(numObjectsLabel, numObjectsField);
+            mainPane.add(numObjectsBox, 0, 0, 2, 1);
+        }
+
+        HBox buttonBox = new HBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(phase1Button, phase2Button);
+        mainPane.add(buttonBox, 0, 1, 2, 1);
 
         // Set alignment for specific components
-        GridPane.setHalignment(numObjectsLabel, HPos.RIGHT);
-        GridPane.setHalignment(numObjectsField, HPos.LEFT);
-        GridPane.setHalignment(phase1Button, HPos.CENTER);
-        GridPane.setHalignment(phase2Button, HPos.CENTER);
+        if (!phase1Completed) {
+            GridPane.setHalignment(numObjectsBox, HPos.CENTER);
+        }
+        GridPane.setHalignment(buttonBox, HPos.CENTER);
 
         Scene scene = new Scene(mainPane, 400, 300);
         stage.setScene(scene);
@@ -316,11 +324,14 @@ public class GUIMain extends Application {
     }
 
     private void returnToMainPage() {
+        phase1Completed = true; // Set the flag to true when returning to the main page
         stage.close();
         start(new Stage());
     }
 
     private void startPhase2() {
+       
+
         stage.close();
         stage = new Stage();
         stage.setTitle("Phase 2 - Automation");
@@ -413,10 +424,47 @@ public class GUIMain extends Application {
         mainPane.add(logBox, 2, 0, 1, 3);
 
 
+        // Add Phase 1 information to the left in the middle
+        VBox phase1InfoBox = new VBox(10);
+        phase1InfoBox.setAlignment(Pos.CENTER_LEFT);
+        phase1InfoBox.setPadding(new Insets(10));
+        phase1InfoBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
+        Label phase1InfoLabel = new Label("Phase 1 Information:");
+        phase1InfoLabel.setTextFill(Color.WHITE);
+        phase1InfoBox.getChildren().addAll(
+            phase1InfoLabel,
+            new Label("Number of Objects Done: " + distributorCount),
+            new Label("Number of Errors: " + totalErrors),
+            new Label("Tons Done for Each Material:"),
+            new Label("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons"),
+            new Label("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons"),
+            new Label("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons"),
+            new Label("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons")
+        );
+        phase1InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
+        mainPane.add(phase1InfoBox, 0, 3, 2, 1);
+        
+        timeMultiplier = 1;
+        metalCount = 0;
+        plasticCount = 0;
+        glassCount = 0;
+        paperCount = 0;
+        distributorCount = 0;
+        totalPlasticWeight = 0;
+        totalMetalWeight = 0;
+        totalGlassWeight = 0;
+        totalPaperWeight = 0;
+        totalErrors = 0;
+        totalSortingTime = 0;
+        totalSortedItems = 0;
+        sorterCount = 0;
+        distributorCount = 0;
+
         GridPane.setHalignment(timeLabel, HPos.CENTER);
         GridPane.setHalignment(buttonBox, HPos.CENTER);
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
+        GridPane.setHalignment(phase1InfoBox, HPos.LEFT);
 
         Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
