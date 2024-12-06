@@ -13,6 +13,27 @@ public class Recyclableitem {
     private double time_to_distribute;
 
     // Constructor
+    public Recyclableitem(String itemType) {
+        this.itemType = itemType;
+        this.sortingError = false;
+        this.itemWeight = getFixedWeight(itemType); // Assign fixed weight
+        this.setisdone_distribute(false);
+        this.setisDone_sorting(false);
+        this.setItemType_sorter(itemType);
+        this.time_to_sort = 0.0;
+    }
+    public Recyclableitem(Recyclableitem other) {
+        this.itemType = other.itemType;
+        this.itemType_sorter = other.itemType_sorter;
+        this.sortingError = other.sortingError;
+        this.itemWeight = other.itemWeight;
+        this.done_sorting = other.done_sorting;
+        this.done_distribute = other.done_distribute;
+        this.time_to_sort = other.time_to_sort;
+        this.time_to_distribute = other.time_to_distribute;
+    }
+
+    // New constructor to accept both itemType and itemWeight
     public Recyclableitem(String itemType, double itemWeight) {
         this.itemType = itemType;
         this.sortingError = false;
@@ -21,6 +42,21 @@ public class Recyclableitem {
         this.setisDone_sorting(false);
         this.setItemType_sorter(itemType);
         this.time_to_sort = 0.0;
+    }
+
+    private double getFixedWeight(String itemType) {
+        switch (itemType) {
+            case "Metal":
+                return 1.0; // Fixed weight for Metal
+            case "Plastic":
+                return 0.5; // Fixed weight for Plastic
+            case "Glass":
+                return 2.0; // Fixed weight for Glass
+            case "Paper":
+                return 0.3; // Fixed weight for Paper
+            default:
+                return 0.0; // Default weight
+        }
     }
 
     // Getter and Setter methods
@@ -41,40 +77,12 @@ public class Recyclableitem {
     public String getItemType_sorter() { return itemType_sorter; }
     public void setItemType_sorter(String itemType_sorter) { this.itemType_sorter = itemType_sorter; }
     // Method to create a list of Recycle objects
-    public static List<Recyclableitem> createList(int number) {
+    public static List<Recyclableitem> createList(int numObjects) {
         List<Recyclableitem> items = new ArrayList<>();
-        Random random = new Random();
-
-        for (int i = 0; i < number; i++) {
-            int type = random.nextInt(4);
-            double itemWeight = 0.1 + (2.0 - 0.1) * random.nextDouble();
-
-            switch (type) {
-                case 0:
-                    Plastic plastic = new Plastic(itemWeight);
-                    if (random.nextBoolean()) {
-                        plastic.compress();
-                    }
-                    items.add(plastic);
-                    break;
-                case 1:
-                    Metal metal = new Metal(itemWeight * 4);
-                    if (random.nextBoolean()) {
-                        metal.compress();
-                    }
-                    items.add(metal);
-                    break;
-                case 2:
-                    items.add(new Glass(itemWeight * 2));
-                    break;
-                case 3:
-                    Paper paper = new Paper(itemWeight * 0.2);
-                    if (random.nextBoolean()) {
-                        paper.compress();
-                    }
-                    items.add(paper);
-                    break;
-            }
+        String[] types = {"Metal", "Plastic", "Glass", "Paper"};
+        for (int i = 0; i < numObjects; i++) {
+            String type = types[i % types.length];
+            items.add(new Recyclableitem(type));
         }
         return items;
     }

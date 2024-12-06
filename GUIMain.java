@@ -2,7 +2,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
@@ -18,12 +17,8 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.GridPane;
 import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.application.Platform;
-
-
 
 public class GUIMain extends Application {
     private Stage stage;
@@ -74,7 +69,6 @@ public class GUIMain extends Application {
     private Sorter sorter;
     private Distributor distributor;
     private Button resetTirednessButton;
-    private boolean phase1Done = false; // Add a flag to track if Phase 1 is done
     private Button phase2Button; // Declare phase2Button as a class-level variable
     private VBox phase2InfoBox; // Declare phase2InfoBox as a class-level variable
     private int phase2DistributorCount = 0;
@@ -84,6 +78,9 @@ public class GUIMain extends Application {
     private double phase2TotalGlassWeight = 0;
     private double phase2TotalPaperWeight = 0;
     private boolean phase1Completed = false; // Add a flag to track if Phase 1 is completed
+    private List<Recyclableitem> items; // Declare a single list for both methods
+    private List<Recyclableitem> phase1Items;
+    private List<Recyclableitem> phase2Items;
 
     @Override
     public void start(Stage primaryStage) {
@@ -161,10 +158,16 @@ public class GUIMain extends Application {
         stage.close();
         stage = new Stage();
         stage.setTitle("Simulation");
+        items = Recyclableitem.createList(numObjects);
+        phase1Items = new ArrayList<>();
+        phase2Items = new ArrayList<>();
+            for (Recyclableitem item : items) {
+                phase1Items.add(new Recyclableitem(item));
+                phase2Items.add(new Recyclableitem(item));
+            }
 
         GridPane mainPane = new GridPane();
         mainPane.setAlignment(Pos.CENTER);
-        mainPane.setPadding(new Insets(20));
         mainPane.setHgap(10);
         mainPane.setVgap(10);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -328,6 +331,7 @@ public class GUIMain extends Application {
     }
 
     private void startPhase2() {
+        resetItems(); // Reset the items before starting Phase 2
         stage.close();
         stage = new Stage();
         stage.setTitle("Phase 2 - Automation");
@@ -338,7 +342,6 @@ public class GUIMain extends Application {
         mainPane.setHgap(10);
         mainPane.setVgap(10);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
-
 
         timeLabel = new Label("Time: 00:00:00");
         timeLabel.setTextFill(Color.WHITE);
@@ -370,7 +373,6 @@ public class GUIMain extends Application {
             speedUp4xButton.setDisable(false);
             speedUp1xButton.setDisable(false);
             startAutomationSimulation();
-
         });
 
         // Define event handlers for speed-up buttons
@@ -438,7 +440,7 @@ public class GUIMain extends Application {
         phase1InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
         mainPane.add(phase1InfoBox, 0, 3, 2, 1);
 
-        // Initialize Phase 2 information to 0
+        // Initialize Phase 2 information to zero
         phase2DistributorCount = 0;
         phase2TotalErrors = 0;
         phase2TotalPlasticWeight = 0;
@@ -458,7 +460,7 @@ public class GUIMain extends Application {
             new Label("Number of Errors: " + phase2TotalErrors),
             new Label("Tons Done for Each Material:"),
             new Label("Plastic: " + String.format("%.5f", phase2TotalPlasticWeight / 1000) + " tons"),
-            new Label(String.format("Metal: %.5f", phase2TotalMetalWeight / 1000) + " tons"),
+            new Label("Metal: " + String.format("%.5f", phase2TotalMetalWeight / 1000) + " tons"),
             new Label("Glass: " + String.format("%.5f", phase2TotalGlassWeight / 1000) + " tons"),
             new Label("Paper: " + String.format("%.5f", phase2TotalPaperWeight / 1000) + " tons")
         );
@@ -493,17 +495,25 @@ public class GUIMain extends Application {
         errorImage = new Image("file:error.png");
     }
 
+    private void resetItems() {
+        for (Recyclableitem item : items) {
+            item.setisDone_sorting(false);
+            item.setisdone_distribute(false);
+        }
+        movingObjects.clear(); // Clear the moving objects list
+    }
+
     private void startAutomationSimulation() {
         System.out.println(numObjects);
         System.out.println(numItemsSame);
-        List<Recyclableitem> items = Recyclableitem.createList(numObjects);
+        // items = Recyclableitem.createList(numObjects); // Remove re-initialization
         Employee automation_sort = new Sensor(1, 0.0, "lazer");
         Employee automation_distribute = new Sensor(2, 0.0, "piston");
         railPane.setMovingObjects(movingObjects);
 
         new Thread(() -> {
             int startX = -50;
-            for (Recyclableitem item : items) {
+            for (Recyclableitem item : phase2Items) {
                 movingObjects.add(new MovingObject(item, startX, automation_sort, automation_distribute));
                 railPane.repaint();
                 startX -= 35;
@@ -551,7 +561,7 @@ public class GUIMain extends Application {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(numObjects);
+        // items = Recyclableitem.createList(numObjects); // Remove re-initialization
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         sorter = new Sorter(1, 5.0, "Moha");
         distributor = new Distributor(2, 5.0, "spotty");
@@ -560,7 +570,7 @@ public class GUIMain extends Application {
 
         new Thread(() -> {
             int startX = -50;
-            for (Recyclableitem item : items) {
+            for (Recyclableitem item : phase1Items) {
                 movingObjects.add(new MovingObject(item, startX, sorter, distributor));
                 railPane.repaint();
                 startX -= 35;

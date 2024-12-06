@@ -8,7 +8,6 @@ public class Paper extends Recyclableitem implements Compressible {
         isCompressed = true;
     }
 
-
     @Override
     public boolean isCompressed() {
         return isCompressed;
