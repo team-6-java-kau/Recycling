@@ -288,7 +288,7 @@ public class GUIMain extends Application {
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
 
-        Scene scene = new Scene(mainPane, 1600, 800);
+        Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
@@ -412,7 +412,7 @@ public class GUIMain extends Application {
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
 
-        Scene scene = new Scene(mainPane, 1600, 800);
+        Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
@@ -424,8 +424,8 @@ public class GUIMain extends Application {
         movingObjects = new CopyOnWriteArrayList<>();
 
         backgroundImage = new Image("file:packaging-closing-machine.jpg");
-        sorterImage = new Image("file:soreterSensor.png");
-        distributorImage = new Image("file:distributionSensor.png");
+        sorterImage = new Image("file:sorter.png");
+        distributorImage = new Image("file:distbuter.png");
         plasticImage = new Image("file:PLASTIC.png");
         metalImage = new Image("file:METEL.png");
         glassImage = new Image("file:GLASS.png");
@@ -811,7 +811,7 @@ public class GUIMain extends Application {
         RailPane() {
             this.movingObjects = new ArrayList<>();
             this.lanePositions = new int[4];
-            this.canvas = new Canvas(1300, 800); // Set canvas size
+            this.canvas = new Canvas(1300, 900); // Set canvas size
             getChildren().add(canvas);
         }
 
