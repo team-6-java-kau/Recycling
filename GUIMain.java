@@ -2,7 +2,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
@@ -19,7 +18,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Alert.AlertType;
 import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.application.Platform;
 
 
@@ -77,13 +75,14 @@ public class GUIMain extends Application {
     private Button phase2Button; // Declare phase2Button as a class-level variable
     private boolean phase1_stop = false;
     private List<Recyclableitem> items;
+    private List<Recyclableitem> phase1Items;
+    private List<Recyclableitem> phase2Items;
 
 
     @Override
     public void start(Stage primaryStage) {
         this.stage = primaryStage;
         stage.setTitle("Main Page");
-
         mainBackgroundImage = new Image("file:main-background.jpg");
 
         GridPane mainPane = new GridPane();
@@ -113,7 +112,6 @@ public class GUIMain extends Application {
                 numObjects = Integer.parseInt(numObjectsText);
                 if (numObjects <= 0) {
                     showAlert(AlertType.WARNING, "Invalid Input", "Number of objects must be greater than 0");
-                    items = Recyclableitem.createList(numObjects);
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -149,6 +147,14 @@ public class GUIMain extends Application {
         stage.close();
         stage = new Stage();
         stage.setTitle("Simulation");
+        items = Recyclableitem.createList(numObjects);
+        phase1Items = new ArrayList<>();
+        phase2Items = new ArrayList<>();
+        for (Recyclableitem item : items) {
+            phase1Items.add(new Recyclableitem(item));
+            phase2Items.add(new Recyclableitem(item));
+        }
+        
 
         GridPane mainPane = new GridPane();
         mainPane.setAlignment(Pos.CENTER);
@@ -436,7 +442,7 @@ public class GUIMain extends Application {
     private void startAutomationSimulation() {
         System.out.println(numObjects);
         System.out.println(numItemsSame);
-        items = Recyclableitem.createList(numObjects);
+        //items = Recyclableitem.createList(numObjects);
 
         //List<Recyclableitem> Autolist = new ArrayList<>(items);
     
@@ -446,7 +452,7 @@ public class GUIMain extends Application {
     
         new Thread(() -> {
             int startX = -50;
-            for (Recyclableitem item : items) { // Use 'item' as the loop variable
+            for (Recyclableitem item : phase2Items) { // Use 'item' as the loop variable
                 movingObjects.add(new MovingObject(item, startX, automation_sort, automation_distribute));
                 railPane.repaint();
                 startX -= 35;
@@ -495,7 +501,7 @@ public class GUIMain extends Application {
 
     private void startSimulation() {
         //List<Recyclableitem> Manuallist = new ArrayList<>(items);
-        items = Recyclableitem.createList(numObjects);
+       // items = Recyclableitem.createList(numObjects);
 
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         sorter = new Sorter(1, 5.0, "Moha");
@@ -505,7 +511,7 @@ public class GUIMain extends Application {
 
         new Thread(() -> {
             int startX = -50;
-            for (Recyclableitem item : items) {
+            for (Recyclableitem item : phase1Items) {
                 movingObjects.add(new MovingObject(item, startX, sorter, distributor));
                 railPane.repaint();
                 startX -= 35;
@@ -572,8 +578,6 @@ public class GUIMain extends Application {
         int x, y;
         Image image;
         Recyclableitem item;
-        boolean sorted;
-        boolean distributed;
         Employee sorterEmployee;
         Employee distributorEmployee;
         boolean isDistributing = false;
@@ -581,13 +585,10 @@ public class GUIMain extends Application {
         MovingObject(Recyclableitem item, int startX, Employee sorterEmployee, Employee distributorEmployee) {
             this.item = item;
             this.x = startX;
-            this.y = 0;
+            this.y = 450; // Set initial y position to the middle of the rail (adjust as needed)
             this.image = getImageForType(item.getItemType());
-            this.sorted = false;
-            this.distributed = false;
             this.sorterEmployee = sorterEmployee;
             this.distributorEmployee = distributorEmployee;
-
         }
 
         private Image getImageForType(String itemType) {
@@ -706,7 +707,6 @@ public class GUIMain extends Application {
                             totalPaperWeight += item.getItemWeight(); // Update total paper weight
                             break;
                     }
-                    distributed = true; // Mark the object as distributed
                     distributorCount++; // Increment the distributor count
                     isDistributing = false; // Reset the distributing flag
                     javafx.application.Platform.runLater(() -> {
