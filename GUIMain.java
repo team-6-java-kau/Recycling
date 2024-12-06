@@ -105,8 +105,8 @@ public class GUIMain extends Application {
 
         Button phase1Button = new Button("Phase 1");
         phase2Button = new Button("Phase 2"); // Initialize phase2Button
-        phase1Button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-        phase2Button.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+        phase1Button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14pt; -fx-padding: 10px 20px;");
+        phase2Button.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14pt; -fx-padding: 10px 20px;");
         phase2Button.setDisable(true); // Disable Phase 2 button initially
 
         phase1Button.setOnAction(e -> {
@@ -131,21 +131,24 @@ public class GUIMain extends Application {
 
         phase2Button.setOnAction(e -> startPhase2());
 
-        // Add components to the grid with specific positions
+        // Declare numObjectsBox outside the if block
+        HBox numObjectsBox = new HBox(10);
         if (!phase1Completed) {
-            mainPane.add(numObjectsLabel, 0, 0);
-            mainPane.add(numObjectsField, 1, 0);
+            numObjectsBox.setAlignment(Pos.CENTER);
+            numObjectsBox.getChildren().addAll(numObjectsLabel, numObjectsField);
+            mainPane.add(numObjectsBox, 0, 0, 2, 1);
         }
-        mainPane.add(phase1Button, 0, 1);
-        mainPane.add(phase2Button, 1, 1);
+
+        HBox buttonBox = new HBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(phase1Button, phase2Button);
+        mainPane.add(buttonBox, 0, 1, 2, 1);
 
         // Set alignment for specific components
         if (!phase1Completed) {
-            GridPane.setHalignment(numObjectsLabel, HPos.RIGHT);
-            GridPane.setHalignment(numObjectsField, HPos.LEFT);
+            GridPane.setHalignment(numObjectsBox, HPos.CENTER);
         }
-        GridPane.setHalignment(phase1Button, HPos.CENTER);
-        GridPane.setHalignment(phase2Button, HPos.CENTER);
+        GridPane.setHalignment(buttonBox, HPos.CENTER);
 
         Scene scene = new Scene(mainPane, 400, 300);
         stage.setScene(scene);
@@ -455,7 +458,7 @@ public class GUIMain extends Application {
             new Label("Number of Errors: " + phase2TotalErrors),
             new Label("Tons Done for Each Material:"),
             new Label("Plastic: " + String.format("%.5f", phase2TotalPlasticWeight / 1000) + " tons"),
-            new Label("Metal: ".format("%.5f", phase2TotalMetalWeight / 1000) + " tons"),
+            new Label(String.format("Metal: %.5f", phase2TotalMetalWeight / 1000) + " tons"),
             new Label("Glass: " + String.format("%.5f", phase2TotalGlassWeight / 1000) + " tons"),
             new Label("Paper: " + String.format("%.5f", phase2TotalPaperWeight / 1000) + " tons")
         );
