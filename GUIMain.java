@@ -83,6 +83,7 @@ public class GUIMain extends Application {
     private double phase2TotalMetalWeight = 0;
     private double phase2TotalGlassWeight = 0;
     private double phase2TotalPaperWeight = 0;
+    private boolean phase1Completed = false; // Add a flag to track if Phase 1 is completed
 
     @Override
     public void start(Stage primaryStage) {
@@ -131,14 +132,18 @@ public class GUIMain extends Application {
         phase2Button.setOnAction(e -> startPhase2());
 
         // Add components to the grid with specific positions
-        mainPane.add(numObjectsLabel, 0, 0);
-        mainPane.add(numObjectsField, 1, 0);
+        if (!phase1Completed) {
+            mainPane.add(numObjectsLabel, 0, 0);
+            mainPane.add(numObjectsField, 1, 0);
+        }
         mainPane.add(phase1Button, 0, 1);
         mainPane.add(phase2Button, 1, 1);
 
         // Set alignment for specific components
-        GridPane.setHalignment(numObjectsLabel, HPos.RIGHT);
-        GridPane.setHalignment(numObjectsField, HPos.LEFT);
+        if (!phase1Completed) {
+            GridPane.setHalignment(numObjectsLabel, HPos.RIGHT);
+            GridPane.setHalignment(numObjectsField, HPos.LEFT);
+        }
         GridPane.setHalignment(phase1Button, HPos.CENTER);
         GridPane.setHalignment(phase2Button, HPos.CENTER);
 
@@ -314,6 +319,7 @@ public class GUIMain extends Application {
     }
 
     private void returnToMainPage() {
+        phase1Completed = true; // Set the flag to true when returning to the main page
         stage.close();
         start(new Stage());
     }
