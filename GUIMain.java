@@ -76,6 +76,7 @@ public class GUIMain extends Application {
     private Button resetTirednessButton;
     private Button phase2Button; // Declare phase2Button as a class-level variable
     private boolean phase1_stop = false;
+    private List<Recyclableitem> items;
 
 
     @Override
@@ -112,6 +113,7 @@ public class GUIMain extends Application {
                 numObjects = Integer.parseInt(numObjectsText);
                 if (numObjects <= 0) {
                     showAlert(AlertType.WARNING, "Invalid Input", "Number of objects must be greater than 0");
+                    items = Recyclableitem.createList(numObjects);
                     return;
                 }
             } catch (NumberFormatException ex) {
@@ -240,7 +242,7 @@ public class GUIMain extends Application {
             resumeSimulation();
         });
         speedUp4xButton.setOnAction(e -> {
-            setTimeMultiplier(16);
+            setTimeMultiplier(4);
             resumeSimulation();
         });
         stopButton.setOnAction(e -> {
@@ -434,14 +436,17 @@ public class GUIMain extends Application {
     private void startAutomationSimulation() {
         System.out.println(numObjects);
         System.out.println(numItemsSame);
-        List<Recyclableitem> items = Recyclableitem.createList(numObjects);
+        items = Recyclableitem.createList(numObjects);
+
+        //List<Recyclableitem> Autolist = new ArrayList<>(items);
+    
         Employee automation_sort = new Sensor(1, 0.0, "lazer");
         Employee automation_distribute = new Sensor(2, 0.0, "piston");
         railPane.setMovingObjects(movingObjects);
-
+    
         new Thread(() -> {
             int startX = -50;
-            for (Recyclableitem item : items) {
+            for (Recyclableitem item : items) { // Use 'item' as the loop variable
                 movingObjects.add(new MovingObject(item, startX, automation_sort, automation_distribute));
                 railPane.repaint();
                 startX -= 35;
@@ -452,7 +457,7 @@ public class GUIMain extends Application {
                 }
             }
         }).start();
-
+    
         startTime = System.currentTimeMillis();
         clockTimer = new AnimationTimer() {
             @Override
@@ -489,7 +494,9 @@ public class GUIMain extends Application {
     }
 
     private void startSimulation() {
-        List<Recyclableitem> items = Recyclableitem.createList(numObjects);
+        //List<Recyclableitem> Manuallist = new ArrayList<>(items);
+        items = Recyclableitem.createList(numObjects);
+
         int experienceInput = Integer.parseInt(experienceField.getText().trim());
         sorter = new Sorter(1, 5.0, "Moha");
         distributor = new Distributor(2, 5.0, "spotty");
