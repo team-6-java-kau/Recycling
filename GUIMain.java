@@ -369,7 +369,6 @@ public class GUIMain extends Application {
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
         phase1Button.setDisable(true); // Disable Phase 2 button initially
 
-
         timeLabel = new Label("Time: 00:00:00");
         timeLabel.setTextFill(Color.WHITE);
 
@@ -528,6 +527,8 @@ public class GUIMain extends Application {
         errorImage = new Image("file:error.png");
         
         // Ensure the rail is drawn when the Phase 2 page is shown
+        startTime = System.currentTimeMillis();
+        elapsedTimeBefore = 0;
         railPane.repaint();
     }
 
@@ -569,6 +570,7 @@ public class GUIMain extends Application {
                 railPane.repaint();
             }
         };
+        startTime = System.currentTimeMillis();
         clockTimer.start();
     }
 
