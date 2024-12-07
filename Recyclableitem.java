@@ -23,6 +23,18 @@ public class Recyclableitem {
         this.time_to_sort = 0.0;
     }
 
+    // Copy constructor
+    public Recyclableitem(Recyclableitem other) {
+        this.itemType = other.itemType;
+        this.itemType_sorter = other.itemType_sorter;
+        this.sortingError = other.sortingError;
+        this.itemWeight = other.itemWeight;
+        this.done_sorting = other.done_sorting;
+        this.done_distribute = other.done_distribute;
+        this.time_to_sort = other.time_to_sort;
+        this.time_to_distribute = other.time_to_distribute;
+    }
+
     // Getter and Setter methods
     public String getItemType() { return itemType; }
     public void setItemType(String itemType) { this.itemType = itemType; }
