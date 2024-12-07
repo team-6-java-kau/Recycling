@@ -72,6 +72,7 @@ public class GUIMain extends Application {
     private Sorter sorter;
     private Distributor distributor;
     private Button resetTirednessButton;
+    private Button phase1Button; // Declare phase1Button as a class-level variable
     private Button phase2Button; // Declare phase2Button as a class-level variable
     private boolean phase1_stop = false;
     private boolean phase1Completed = false; // Add a flag to track if Phase 1 is completed
@@ -93,7 +94,7 @@ public class GUIMain extends Application {
         this.stage = primaryStage;
         stage.setTitle("Main Page");
         mainBackgroundImage = new Image("file:main-background.jpg");
-
+        
         GridPane mainPane = new GridPane();
         mainPane.setAlignment(Pos.CENTER);
         mainPane.setPadding(new Insets(20));
@@ -102,9 +103,15 @@ public class GUIMain extends Application {
         BackgroundImage backgroundImage = new BackgroundImage(mainBackgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         mainPane.setBackground(new Background(backgroundImage));
 
+        Label titleLabel = new Label("Recycling Factory");
+        titleLabel.setFont(Font.font("Times New Roman", FontWeight.BOLD, 24));
+        titleLabel.setTextFill(Color.BLACK);
+        mainPane.add(titleLabel, 0, 0, 2, 1); // Move the title to row 0
+        GridPane.setMargin(titleLabel, new Insets(4, 1, 11, 63)); // Move the title up by 20 pixels
+
         Label numObjectsLabel = new Label("Number of Objects:");
         numObjectsField = new TextField();
-
+        phase1Button = new Button("Phase 1");
         Button phase1Button = new Button("Phase 1");
         phase2Button = new Button("Phase 2"); // Initialize phase2Button
         phase1Button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
@@ -138,13 +145,23 @@ public class GUIMain extends Application {
         if (!phase1Completed) {
             numObjectsBox.setAlignment(Pos.CENTER);
             numObjectsBox.getChildren().addAll(numObjectsLabel, numObjectsField);
-            mainPane.add(numObjectsBox, 0, 0, 2, 1);
+            mainPane.add(numObjectsBox, 0, 1, 2, 1);
+            GridPane.setMargin(numObjectsBox, new Insets(0, 88, 44, -20)); // Move the numObjectsBox to the left by 20 pixels
+        }
+        else {
+            numObjectsLabel.setTextFill(Color.WHITE); 
+            numObjectsField.setDisable(true);
+            numObjectsBox.setAlignment(Pos.CENTER);
+            numObjectsBox.getChildren().addAll(numObjectsLabel, numObjectsField);
+            mainPane.add(numObjectsBox, 0, 1, 2, 1);
+            GridPane.setMargin(numObjectsBox, new Insets(0, 88, 44, -20)); // Move the numObjectsBox to the left by 20 pixels
         }
 
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(phase1Button, phase2Button);
-        mainPane.add(buttonBox, 0, 1, 2, 1);
+        mainPane.add(buttonBox, 0, 1, 2, 1); // Move the buttonBox up by 3 steps
+        GridPane.setMargin(buttonBox, new Insets(1, 1, -33, 1)); // Move the numObjectsBox to the left by 20 pixels
 
         // Set alignment for specific components
         if (!phase1Completed) {
@@ -344,13 +361,13 @@ public class GUIMain extends Application {
         stage.close();
         stage = new Stage();
         stage.setTitle("Phase 2 - Automation");
-
         GridPane mainPane = new GridPane();
         mainPane.setAlignment(Pos.CENTER);
         mainPane.setPadding(new Insets(20));
         mainPane.setHgap(10);
         mainPane.setVgap(10);
         mainPane.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
+        phase1Button.setDisable(true); // Disable Phase 2 button initially
 
 
         timeLabel = new Label("Time: 00:00:00");
