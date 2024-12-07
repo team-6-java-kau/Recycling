@@ -78,6 +78,7 @@ public class GUIMain extends Application {
     private List<Recyclableitem> items;
     private List<Recyclableitem> phase1Items;
     private List<Recyclableitem> phase2Items;
+    private String finaltime;
 
 
     @Override
@@ -429,21 +430,29 @@ public class GUIMain extends Application {
         phase1InfoBox.setAlignment(Pos.CENTER_LEFT);
         phase1InfoBox.setPadding(new Insets(10));
         phase1InfoBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
+        // Set preferred size
+        phase1InfoBox.setPrefWidth(10); // Set preferred width
+        phase1InfoBox.setPrefHeight(400); // Set preferred height
+
         Label phase1InfoLabel = new Label("Phase 1 Information:");
         phase1InfoLabel.setTextFill(Color.WHITE);
-        phase1InfoBox.getChildren().addAll(
-            phase1InfoLabel,
-            new Label("Number of Objects Done: " + distributorCount),
-            new Label("Number of Errors: " + totalErrors),
-            new Label("Tons Done for Each Material:"),
-            new Label("Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons"),
-            new Label("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons"),
-            new Label("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons"),
-            new Label("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons")
+
+        TextArea phase1InfoTextArea = new TextArea();
+        phase1InfoTextArea.setEditable(false);
+        phase1InfoTextArea.setWrapText(true);
+        phase1InfoTextArea.setText(
+            "Number of Objects Done: " + distributorCount + "\n" +
+            "Number of Errors: " + totalErrors + "\n" +
+            "Tons Done for Each Material:\n" +
+            "Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons\n" +
+            "Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons\n" +
+            "Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons\n" +
+            "Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons\n" +
+            "Time: " + finaltime
         );
-        phase1InfoBox.getChildren().forEach(node -> ((Label) node).setTextFill(Color.WHITE));
-        mainPane.add(phase1InfoBox, 0, 3, 2, 1);
-        
+        phase1InfoBox.getChildren().addAll(phase1InfoLabel, phase1InfoTextArea);
+        mainPane.add(phase1InfoBox, 0, 0, 2, 1);
+        finaltime = null;
         timeMultiplier = 1;
         metalCount = 0;
         plasticCount = 0;
@@ -785,6 +794,12 @@ public class GUIMain extends Application {
                             if (allItemsDistributed() && (!pahse2_done && phase1_stop)) {
                                 pahse2_done = true;
                                 clockTimer.stop(); // Stop the timer when all objects are distributed
+                                long currentTime = System.currentTimeMillis();
+                                long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                                int hours = (int) (elapsedTime / 3600000);
+                                int minutes = (int) (elapsedTime / 60000) % 60;
+                                int seconds = (int) (elapsedTime / 1000) % 60;
+                                finaltime = (String.format("Time: %02d:%02d:%02d", hours, minutes, seconds));
                                 Alert alert = new Alert(AlertType.INFORMATION);
                                 alert.setTitle("Simulation Status");
                                 alert.setHeaderText(null);
@@ -802,6 +817,12 @@ public class GUIMain extends Application {
                             if (allItemsDistributed() && !pahse1_done) {
                                 pahse1_done = true;
                                 clockTimer.stop(); // Stop the timer when all objects are distributed
+                                long currentTime = System.currentTimeMillis();
+                                long elapsedTime = elapsedTimeBefore + (currentTime - startTime) * timeMultiplier;
+                                int hours = (int) (elapsedTime / 3600000);
+                                int minutes = (int) (elapsedTime / 60000) % 60;
+                                int seconds = (int) (elapsedTime / 1000) % 60;
+                                finaltime = (String.format("Time: %02d:%02d:%02d", hours, minutes, seconds));
                                 Alert alert = new Alert(AlertType.INFORMATION);
                                 alert.setTitle("Simulation Status");
                                 alert.setHeaderText(null);
@@ -956,6 +977,7 @@ public class GUIMain extends Application {
             gc.fillRect(mainBeltEnd + 160, middleY + 40, 30, 20); // Glass basket
             gc.fillRect(mainBeltEnd + 160, middleY + 80, 30, 20); // Paper basket
 
+            
             gc.setFill(Color.WHITE);
             gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
             gc.fillText("Metal: " + metalCount, mainBeltEnd + 200, middleY - 110);
@@ -963,8 +985,14 @@ public class GUIMain extends Application {
             gc.fillText("Glass: " + glassCount, mainBeltEnd + 200, middleY + 50);
             gc.fillText("Paper: " + paperCount, mainBeltEnd + 200, middleY + 90);
             
-            
+            // Draw a white box bordered with black
+            gc.setFill(Color.WHITE);
+            gc.fillRect(sorterX - 450, middleY - 350, 250, 200); // Adjust the position and size as needed
+            gc.setStroke(Color.BLACK);
+            gc.strokeRect(sorterX - 450, middleY - 350, 250, 200); // Adjust the position and size as needed
 
+            // Draw the text on top of the box
+            gc.setFill(Color.BLACK); // Set the text color to black
             gc.fillText("Number of Objects Done: " + distributorCount, sorterX - 420, middleY - 330);
             gc.fillText("Number of Errors: " + totalErrors, sorterX - 420, middleY - 310);
             gc.fillText("Tons Done for Each Material:", sorterX - 420, middleY - 290);
@@ -972,22 +1000,8 @@ public class GUIMain extends Application {
             gc.fillText("Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons", sorterX - 420, middleY - 250);
             gc.fillText("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons", sorterX - 420, middleY - 230);
             gc.fillText("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons", sorterX - 420, middleY - 210);
+            gc.fillText(finaltime, sorterX - 420, middleY - 190);
 
-            // Calculate and display hours of working based on total items sorted and distributed
-
-
-            // Calculate and display total sorting time
-            long totalSortingSeconds = totalSortingTime / 1000;
-            int sortingHours = (int) (totalSortingSeconds / 3600);
-            int sortingMinutes = (int) (totalSortingSeconds / 60) % 60;
-            int sortingSeconds = (int) (totalSortingSeconds % 60);
-            gc.fillText(String.format("Total Sorting Time: %02d:%02d:%02d", sortingHours, sortingMinutes, sortingSeconds), sorterX - 420, middleY - 190);
-
-            // Calculate and display average sorting time
-            double averageSortingTime = totalSortedItems > 0 ? (double) totalSortingTime / totalSortedItems / 1000 : 0;
-            int avgSortingMinutes = (int) (averageSortingTime / 60);
-            int avgSortingSeconds = (int) (averageSortingTime % 60);
-            gc.fillText(String.format("Average Sorting Time: %02d:%02d", avgSortingMinutes, avgSortingSeconds), sorterX - 420, middleY - 170);
 
             // Draw the moving objects
             for (MovingObject obj : movingObjects) {
