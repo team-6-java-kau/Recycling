@@ -791,6 +791,9 @@ public class GUIMain extends Application {
                                 alert.setContentText("Phase 2 completed! You can now return to the main page.");
                                 alert.showAndWait(); // Wait for the user to press OK
                                 stopButton.setDisable(true); // Disable the stop button
+                                speedUp1xButton.setDisable(true);
+                                speedUp2xButton.setDisable(true);
+                                speedUp4xButton.setDisable(true);
                                 returnButton.setDisable(false); // Enable the return button
                                 Platform.runLater(() -> {
                                     returnButton.setDisable(false); // Enable the return button
@@ -805,6 +808,11 @@ public class GUIMain extends Application {
                                 alert.setContentText("Phase 1 completed! You can now proceed to Phase 2.");
                                 alert.showAndWait(); // Wait for the user to press OK
                                 stopButton.setDisable(true); // Disable the stop button
+                                speedUp1xButton.setDisable(true);
+                                speedUp2xButton.setDisable(true);
+                                speedUp4xButton.setDisable(true);
+                                changeExperienceButton.setDisable(true);
+                                resetTirednessButton.setDisable(true);
                                 returnButton.setDisable(false); // Enable the return button
                                 Platform.runLater(() -> {
                                     phase2Button.setDisable(false); // Enable Phase 2 button
