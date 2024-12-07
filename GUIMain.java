@@ -452,22 +452,42 @@ public class GUIMain extends Application {
         );
         phase1InfoBox.getChildren().addAll(phase1InfoLabel, phase1InfoTextArea);
         mainPane.add(phase1InfoBox, 0, 0, 2, 1);
-        finaltime = null;
-        timeMultiplier = 1;
-        metalCount = 0;
-        plasticCount = 0;
-        glassCount = 0;
-        paperCount = 0;
-        distributorCount = 0;
-        totalPlasticWeight = 0;
-        totalMetalWeight = 0;
-        totalGlassWeight = 0;
-        totalPaperWeight = 0;
-        totalErrors = 0;
-        totalSortingTime = 0;
-        totalSortedItems = 0;
-        sorterCount = 0;
-        distributorCount = 0;
+
+        // Add comparison VBox to the bottom
+        VBox comparisonBox = new VBox(10);
+        comparisonBox.setAlignment(Pos.CENTER);
+        comparisonBox.setPadding(new Insets(10));
+        comparisonBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
+        // Set preferred size
+        comparisonBox.setPrefWidth(10); // Set preferred width
+        comparisonBox.setPrefHeight(400); // Set preferred height
+
+        Label comparisonLabel = new Label("Comparison of Phase 1 and Phase 2:");
+        comparisonLabel.setTextFill(Color.WHITE);
+
+        TextArea comparisonTextArea = new TextArea();
+        comparisonTextArea.setEditable(false);
+        comparisonTextArea.setWrapText(true);
+        comparisonTextArea.setText(
+            "Phase 1 - Number of Objects Done: " + distributorCount + "\n" +
+            "Phase 2 - Number of Objects Done: " + distributorCount + "\n" +
+            "Phase 1 - Number of Errors: " + totalErrors + "\n" +
+            "Phase 2 - Number of Errors: " + totalErrors + "\n" +
+            "Phase 1 - Tons Done for Each Material:\n" +
+            "Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons\n" +
+            "Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons\n" +
+            "Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons\n" +
+            "Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons\n" +
+            "Phase 2 - Tons Done for Each Material:\n" +
+            "Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons\n" +
+            "Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons\n" +
+            "Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons\n" +
+            "Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons\n" +
+            "Phase 1 - Time: " + finaltime + "\n" +
+            "Phase 2 - Time: " + finaltime
+        );
+        comparisonBox.getChildren().addAll(comparisonLabel, comparisonTextArea);
+        mainPane.add(comparisonBox, 0, 3, 4, 1);
 
         GridPane.setHalignment(timeLabel, HPos.CENTER);
         GridPane.setHalignment(buttonBox, HPos.CENTER);
@@ -475,7 +495,7 @@ public class GUIMain extends Application {
         GridPane.setHalignment(logBox, HPos.CENTER);
         GridPane.setHalignment(phase1InfoBox, HPos.LEFT);
 
-        Scene scene = new Scene(mainPane, 1600, 900);
+        Scene scene = new Scene(mainPane, 1600, 1080);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
