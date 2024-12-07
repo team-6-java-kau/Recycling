@@ -79,6 +79,7 @@ public class GUIMain extends Application {
     private List<Recyclableitem> phase1Items;
     private List<Recyclableitem> phase2Items;
     private String finaltime;
+    private TextArea comparisonTextArea;
 
 
     @Override
@@ -464,27 +465,14 @@ public class GUIMain extends Application {
 
         Label comparisonLabel = new Label("Comparison of Phase 1 and Phase 2:");
         comparisonLabel.setTextFill(Color.WHITE);
-
-        TextArea comparisonTextArea = new TextArea();
+        comparisonTextArea = new TextArea();
         comparisonTextArea.setEditable(false);
         comparisonTextArea.setWrapText(true);
         comparisonTextArea.setText(
-            "Phase 1 - Number of Objects Done: " + distributorCount + "\n" +
-            "Phase 2 - Number of Objects Done: " + distributorCount + "\n" +
             "Phase 1 - Number of Errors: " + totalErrors + "\n" +
-            "Phase 2 - Number of Errors: " + totalErrors + "\n" +
-            "Phase 1 - Tons Done for Each Material:\n" +
-            "Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons\n" +
-            "Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons\n" +
-            "Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons\n" +
-            "Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons\n" +
-            "Phase 2 - Tons Done for Each Material:\n" +
-            "Plastic: " + String.format("%.5f", totalPlasticWeight / 1000) + " tons\n" +
-            "Metal: " + String.format("%.5f", totalMetalWeight / 1000) + " tons\n" +
-            "Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons\n" +
-            "Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons\n" +
             "Phase 1 - Time: " + finaltime + "\n" +
-            "Phase 2 - Time: " + finaltime
+            "Phase 2 - Number of Errors: 0\n" +
+            "Phase 2 - Time: 00:00:00"
         );
         comparisonBox.getChildren().addAll(comparisonLabel, comparisonTextArea);
         mainPane.add(comparisonBox, 0, 3, 4, 1);
@@ -832,6 +820,12 @@ public class GUIMain extends Application {
                                 returnButton.setDisable(false); // Enable the return button
                                 Platform.runLater(() -> {
                                     returnButton.setDisable(false); // Enable the return button
+                                    comparisonTextArea.setText(
+                                        "Phase 1 - Number of Errors: " + totalErrors + "\n" +
+                                        "Phase 1 - Time: " + finaltime + "\n" +
+                                        "Phase 2 - Number of Errors: " + totalErrors + "\n" +
+                                        "Phase 2 - Time: " + finaltime
+                                    );
                                 });
                             }
                             if (allItemsDistributed() && !pahse1_done) {
