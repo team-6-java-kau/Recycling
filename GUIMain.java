@@ -79,8 +79,7 @@ public class GUIMain extends Application {
     private List<Recyclableitem> phase1Items;
     private List<Recyclableitem> phase2Items;
     private String finaltime;
-    private TextArea comparisonTextArea;
-
+    
 
     @Override
     public void start(Stage primaryStage) {
@@ -96,7 +95,15 @@ public class GUIMain extends Application {
         BackgroundImage backgroundImage = new BackgroundImage(mainBackgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         mainPane.setBackground(new Background(backgroundImage));
 
+        Label titleLabel = new Label("Recycling Factory");
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titleLabel.setTextFill(Color.BLACK);
+        mainPane.add(titleLabel, 0, 0, 2, 1); // Move the title to row 0
+        GridPane.setMargin(titleLabel, new Insets(4, 1, 11, 63)); // Move the title up by 20 pixels
+  
         Label numObjectsLabel = new Label("Number of Objects:");
+        titleLabel.setFont(Font.font("Times new roman", FontWeight.BOLD, 24));
+
         numObjectsField = new TextField();
 
         Button phase1Button = new Button("Phase 1");
@@ -132,13 +139,16 @@ public class GUIMain extends Application {
         if (!phase1Completed) {
             numObjectsBox.setAlignment(Pos.CENTER);
             numObjectsBox.getChildren().addAll(numObjectsLabel, numObjectsField);
-            mainPane.add(numObjectsBox, 0, 0, 2, 1);
+            mainPane.add(numObjectsBox, 0, 1, 2, 1);
+            GridPane.setMargin(numObjectsBox, new Insets(0, 88, 44, -20)); // Move the numObjectsBox to the left by 20 pixels
         }
 
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.getChildren().addAll(phase1Button, phase2Button);
-        mainPane.add(buttonBox, 0, 1, 2, 1);
+        mainPane.add(buttonBox, 0, 1, 2, 1); // Move the buttonBox up by 3 steps
+        GridPane.setMargin(buttonBox, new Insets(1, 1, -33, 1)); // Move the numObjectsBox to the left by 20 pixels
+
 
         // Set alignment for specific components
         if (!phase1Completed) {
@@ -465,14 +475,15 @@ public class GUIMain extends Application {
 
         Label comparisonLabel = new Label("Comparison of Phase 1 and Phase 2:");
         comparisonLabel.setTextFill(Color.WHITE);
-        comparisonTextArea = new TextArea();
+
+        TextArea comparisonTextArea = new TextArea();
         comparisonTextArea.setEditable(false);
         comparisonTextArea.setWrapText(true);
         comparisonTextArea.setText(
             "Phase 1 - Number of Errors: " + totalErrors + "\n" +
+            "Phase 2 - Number of Errors: " + totalErrors + "\n" +
             "Phase 1 - Time: " + finaltime + "\n" +
-            "Phase 2 - Number of Errors: 0\n" +
-            "Phase 2 - Time: 00:00:00"
+            "Phase 2 - Time: " + finaltime
         );
         comparisonBox.getChildren().addAll(comparisonLabel, comparisonTextArea);
         mainPane.add(comparisonBox, 0, 3, 4, 1);
@@ -820,12 +831,6 @@ public class GUIMain extends Application {
                                 returnButton.setDisable(false); // Enable the return button
                                 Platform.runLater(() -> {
                                     returnButton.setDisable(false); // Enable the return button
-                                    comparisonTextArea.setText(
-                                        "Phase 1 - Number of Errors: " + totalErrors + "\n" +
-                                        "Phase 1 - Time: " + finaltime + "\n" +
-                                        "Phase 2 - Number of Errors: " + totalErrors + "\n" +
-                                        "Phase 2 - Time: " + finaltime
-                                    );
                                 });
                             }
                             if (allItemsDistributed() && !pahse1_done) {
