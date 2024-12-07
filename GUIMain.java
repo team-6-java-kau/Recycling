@@ -79,6 +79,13 @@ public class GUIMain extends Application {
     private List<Recyclableitem> phase1Items;
     private List<Recyclableitem> phase2Items;
     private String finaltime;
+    private double phase1time;
+    private double phase2time;
+    private int phase1Errors;
+    private int phase2Errors;
+    
+        
+    
 
 
     @Override
@@ -310,7 +317,6 @@ public class GUIMain extends Application {
         stage.show();
 
         // Ensure the rail is drawn when the Phase 1 page is shown
-        railPane.repaint();
 
         movingObjects = new CopyOnWriteArrayList<>();
 
@@ -322,6 +328,8 @@ public class GUIMain extends Application {
         glassImage = new Image("file:GLASS.png");
         paperImage = new Image("file:PAPER.png");
         errorImage = new Image("file:error.png");
+        railPane.repaint();
+
     }
 
     private void returnToMainPage() {
@@ -408,31 +416,14 @@ public class GUIMain extends Application {
         distributingLogArea.setPrefHeight(300);
         distributingLogArea.setPrefWidth(300);
 
-        mainPane.add(timeLabel, 0, 0, 2, 1);
-
-        HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, startButton, returnButton);
-        mainPane.add(buttonBox, 0, 1, 2, 1);
-
-        mainPane.add(railPane, 0, 2, 2, 1);
-
-        VBox logBox = new VBox(10);
-        Label sortingLogLabel = new Label("Sorting Log:");
-        sortingLogLabel.setTextFill(Color.WHITE);
-        Label distributingLogLabel = new Label("Distributing Log:");
-        distributingLogLabel.setTextFill(Color.WHITE);
-        logBox.getChildren().addAll(sortingLogLabel, sortingLogArea, distributingLogLabel, distributingLogArea);
-        mainPane.add(logBox, 2, 0, 1, 3);
-
-
         // Add Phase 1 information to the left in the middle
         VBox phase1InfoBox = new VBox(10);
         phase1InfoBox.setAlignment(Pos.CENTER_LEFT);
         phase1InfoBox.setPadding(new Insets(10));
         phase1InfoBox.setBackground(new Background(new BackgroundFill(Color.web("#5e5e5e"), CornerRadii.EMPTY, Insets.EMPTY)));
         // Set preferred size
-        phase1InfoBox.setPrefWidth(10); // Set preferred width
-        phase1InfoBox.setPrefHeight(400); // Set preferred height
+        phase1InfoBox.setPrefWidth(300); // Set preferred width
+        phase1InfoBox.setPrefHeight(300); // Set preferred height
 
         Label phase1InfoLabel = new Label("Phase 1 Information:");
         phase1InfoLabel.setTextFill(Color.WHITE);
@@ -451,7 +442,33 @@ public class GUIMain extends Application {
             "Time: " + finaltime
         );
         phase1InfoBox.getChildren().addAll(phase1InfoLabel, phase1InfoTextArea);
-        mainPane.add(phase1InfoBox, 0, 0, 2, 1);
+        //mainPane.add(phase1InfoBox, 1, 1, 1, 3);
+        
+        mainPane.add(timeLabel, 0, 0, 2, 1);
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(stopButton, speedUp1xButton, speedUp2xButton, speedUp4xButton, startButton, returnButton);
+        mainPane.add(buttonBox, 0, 1, 2, 1);
+
+        mainPane.add(railPane, 0, 2, 2, 1);
+
+        VBox logBox = new VBox(10);
+        Label sortingLogLabel = new Label("Sorting Log:");
+        sortingLogLabel.setTextFill(Color.WHITE);
+        Label distributingLogLabel = new Label("Distributing Log:");
+        distributingLogLabel.setTextFill(Color.WHITE);
+        logBox.getChildren().addAll(sortingLogLabel, sortingLogArea, distributingLogLabel, distributingLogArea, phase1InfoBox);
+        mainPane.add(logBox, 2, 0, 1, 3);
+
+
+        
+        String[] timeParts = finaltime.replace("Time: ", "").split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        int seconds = Integer.parseInt(timeParts[2]);
+        phase1time = hours * 3600 + minutes * 60 + seconds;
+        phase1Errors = totalErrors;
+
         finaltime = null;
         timeMultiplier = 1;
         metalCount = 0;
@@ -474,26 +491,27 @@ public class GUIMain extends Application {
         GridPane.setHalignment(railPane, HPos.CENTER);
         GridPane.setHalignment(logBox, HPos.CENTER);
         GridPane.setHalignment(phase1InfoBox, HPos.LEFT);
-
+        
         Scene scene = new Scene(mainPane, 1600, 900);
         stage.setScene(scene);
         stage.setResizable(false); // Make the window fixed size
         stage.setOnCloseRequest(e -> Platform.exit()); // Stop the application when the window is closed
         stage.show();
 
-        // Ensure the rail is drawn when the Phase 2 page is shown
-        railPane.repaint();
 
         movingObjects = new CopyOnWriteArrayList<>();
 
         backgroundImage = new Image("file:packaging-closing-machine.jpg");
-        sorterImage = new Image("file:sorter.png");
-        distributorImage = new Image("file:distbuter.png");
+        sorterImage = new Image("file:Sensor.png");
+        distributorImage = new Image("file:machine.png");
         plasticImage = new Image("file:PLASTIC.png");
         metalImage = new Image("file:METEL.png");
         glassImage = new Image("file:GLASS.png");
         paperImage = new Image("file:PAPER.png");
         errorImage = new Image("file:error.png");
+        
+        // Ensure the rail is drawn when the Phase 2 page is shown
+        railPane.repaint();
     }
 
     private void startAutomationSimulation() {
@@ -924,26 +942,42 @@ public class GUIMain extends Application {
                 gc.fillRect(i, middleY - 10, 10, 20); // Make the main belt thicker
             }
 
-            // Draw the sorter employee
-            gc.drawImage(sorterImage, sorterX - 30, middleY - 60, 60, 120); // Adjusted sorter image size
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
-            gc.fillText("Sorter Employee", sorterX - 30, middleY - 70); // Sorter label
-            gc.fillText("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
+            if(phase1Completed){
+                // Draw the sorter employee
+                gc.drawImage(sorterImage, sorterX - 30, middleY - 60, 60, 120); // Adjusted sorter image size
+                gc.setFill(Color.WHITE);
+                gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
+                gc.fillText("Sorting Sensor", sorterX - 30, middleY - 70); // Sorter label
+                gc.fillText("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
 
-            // Display the experience of the sorter employee
-            if (!movingObjects.isEmpty()) {
-                Employee sorterEmployee = movingObjects.get(0).sorterEmployee;
-                gc.fillText("Experience: " + sorterEmployee.getExperienceYears() + " years", sorterX - 30, middleY - 110);
-                gc.fillText(String.format("Tiredness: %.2f", sorterEmployee.getTiredness()), sorterX - 30, middleY - 130);
-                gc.fillText(String.format("Tiredness: %.2f", distributor.getTiredness()), distributorX + 50, middleY - 40);
+                // Draw the distributor employee in front of the main path
+                gc.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120);
+                gc.setFill(Color.WHITE);
+                gc.fillText("Distributor Machine", distributorX + 50, middleY - 0); // Distributor label
+                gc.fillText("Distributed: " + distributorCount, distributorX + 50, middleY - 20); // Distributor counter
             }
-
-            // Draw the distributor employee in front of the main path
-            gc.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120);
-            gc.setFill(Color.WHITE);
-            gc.fillText("Distributor Employee", distributorX + 50, middleY - 0); // Distributor label
-            gc.fillText("Distributed: " + distributorCount, distributorX + 50, middleY - 20); // Distributor counter
+            else if(!phase1Completed){
+                  // Draw the sorter employee
+                  gc.drawImage(sorterImage, sorterX - 30, middleY - 60, 60, 120); // Adjusted sorter image size
+                  gc.setFill(Color.WHITE);
+                  gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 12));
+                  gc.fillText("Sorter Employee", sorterX - 30, middleY - 70); // Sorter label
+                  gc.fillText("Sorted: " + sorterCount, sorterX - 30, middleY - 90); // Sorter counter
+  
+                  // Display the experience of the sorter employee
+                  if (!movingObjects.isEmpty()) {
+                      Employee sorterEmployee = movingObjects.get(0).sorterEmployee;
+                      gc.fillText("Experience: " + sorterEmployee.getExperienceYears() + " years", sorterX - 30, middleY - 110);
+                      gc.fillText(String.format("Tiredness: %.2f", sorterEmployee.getTiredness()), sorterX - 30, middleY - 130);
+                      gc.fillText(String.format("Tiredness: %.2f", distributor.getTiredness()), distributorX + 50, middleY - 40);
+                  }
+  
+                  // Draw the distributor employee in front of the main path
+                  gc.drawImage(distributorImage, distributorX - 15, middleY - 50, 60, 120);
+                  gc.setFill(Color.WHITE);
+                  gc.fillText("Distributor Employee", distributorX + 50, middleY - 0); // Distributor label
+                  gc.fillText("Distributed: " + distributorCount, distributorX + 50, middleY - 20); // Distributor counter
+            }
 
             // Draw the connecting paths to the additional lanes
             gc.setFill(Color.DARKGRAY);
@@ -1001,9 +1035,33 @@ public class GUIMain extends Application {
             gc.fillText("Glass: " + String.format("%.5f", totalGlassWeight / 1000) + " tons", sorterX - 420, middleY - 230);
             gc.fillText("Paper: " + String.format("%.5f", totalPaperWeight / 1000) + " tons", sorterX - 420, middleY - 210);
             gc.fillText(finaltime, sorterX - 420, middleY - 190);
+            
+            if(phase1Completed){
+                // Draw a comparison box
+                gc.setFill(Color.WHITE);
+                gc.fillRect(sorterX - 450, middleY + 60, 250, 100); // Adjust the position and size as needed
+                gc.setStroke(Color.BLACK);
+                gc.strokeRect(sorterX - 450, middleY + 60, 250, 100); // Adjust the position and size as needed
+                phase2time = 0.0;
+                if(finaltime != null){
+                    String[] timeParts = finaltime.replace("Time: ", "").split(":");
+                    int hours = Integer.parseInt(timeParts[0]);
+                    int minutes = Integer.parseInt(timeParts[1]);
+                    int seconds = Integer.parseInt(timeParts[2]);
+                    phase2time = hours * 3600 + minutes * 60 + seconds;
+                }
+                phase2Errors = totalErrors; 
+                // Calculate the percentage improvements
+                double timeImprovement = ((phase1time - phase2time) / phase1time) * 100;
+                double errorImprovement = ((phase1Errors - phase2Errors) / (double) phase1Errors) * 100;
 
-
-            // Draw the moving objects
+                // Draw the text on top of the comparison box
+                gc.setFill(Color.BLACK); // Set the text color to black
+                gc.fillText("Comparison with Phase 1:", sorterX - 420, middleY + 80);
+                gc.fillText("Time Improvement: " + String.format("%.2f", timeImprovement) + "%", sorterX - 420, middleY + 120);
+                gc.fillText("Error Reduction: " + String.format("%.2f", errorImprovement) + "%", sorterX - 420, middleY + 140);
+                // Draw the moving objects 
+        }
             for (MovingObject obj : movingObjects) {
                 obj.updatePosition(); // Update position here
                 obj.draw(gc, middleY, mainBeltEnd, sorterX, distributorX, lanePositions);
