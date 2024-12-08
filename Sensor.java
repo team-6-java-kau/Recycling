@@ -10,6 +10,7 @@ public class Sensor extends Employee {
         this.errorsNum = 0;
     }
 
+    // Getters and setters
     public Integer getSensorNumber() { return sensorNumber; }
     public void setSensorNumber(Integer sensorNumber) { this.sensorNumber = sensorNumber; }
     public Double getWorkingHours() { return workingHours; }
@@ -19,12 +20,13 @@ public class Sensor extends Employee {
     public Integer getErrorsNum() { return errorsNum; }
     public void setErrorsNum(Integer errorsNum) { this.errorsNum = errorsNum; }
 
+    // Increment methods
     public void incrementItemsDone() { this.itemsDone++; }
     public void incrementErrorsNum() { this.errorsNum++; }
 
     @Override
     public double calculateSortTime(Recyclableitem recyclable) {
-        double sortTime = 0.1;
+        double sortTime = 0.1; // Fixed sort time for sensors
         recyclable.set_time_to_sort(sortTime);
         return sortTime;
     }
@@ -39,7 +41,7 @@ public class Sensor extends Employee {
 
     @Override
     public double calculateDistributeTime(Recyclableitem item) {
-        double distributeTime = 0.1;
+        double distributeTime = 0.1; // Fixed distribute time for sensors
         item.set_time_to_distribute(distributeTime);
         return distributeTime;
     }
