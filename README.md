@@ -46,6 +46,9 @@ This project simulates a recycling factory with two phases: manual sorting by em
 - `Plastic`, `Metal`, `Glass`, `Paper`: Specific types of recyclable items.
 - `Main`: Contains the main method for running the simulation.
 - `GUIMain`: Contains the GUI implementation for the simulation.
+- `Employee`: Abstract class representing an employee in the factory.
+- `Distributor`: Represents an employee who distributes items.
+- `Compressible`: Interface for items that can be compressed.
 
 ## Future Improvements
 
