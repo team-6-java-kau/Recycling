@@ -754,8 +754,9 @@ public class GUIMain extends Application {
                     if (item.getsortingError()) {
                         gc.setFill(Color.RED); // Set the color to red for errors
                     } else {
-                        gc.setFill(Color.GREEN); // Set the color to green for correct sorting
+                        gc.setFill(Color.AQUA); // Set the color to green for correct sorting
                     }
+                    gc.setFont(Font.font("Times New Roman", FontWeight.BOLD, 20)); // Set the font size
                     gc.fillText(item.getItemType(), x, y - 25); // Display the item type
                 }
             }
